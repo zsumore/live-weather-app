@@ -209,7 +209,7 @@ const Master = React.createClass({
                 float: 'left'
             }}><div className={'menu'
             }><ul><li><a>天气雷达</a></li><li><IconMenu iconButtonElement={
-            <IconButton><MoreVertIcon /></IconButton>
+            <IconButton className={'hint--bottom'} data-hint={'设置'}><MoreVertIcon /></IconButton>
             }
             targetOrigin={{
                 horizontal: 'left',
@@ -223,7 +223,7 @@ const Master = React.createClass({
         <MenuItem leftIcon={<ActionFavorite color={Colors.grey500} hoverColor={Colors.orange300} />} primaryText='浅色主题' />
         <MenuItem leftIcon={<ActionFavorite color={Colors.grey900} hoverColor={Colors.orange300} />} primaryText='深色主题' />
         <Divider />
-        <MenuItem leftIcon={<ContentDrafts color={Colors.cyanA400} hoverColor={Colors.orange300} />} primaryText='说明文档' />
+        <MenuItem  leftIcon={<ContentDrafts color={Colors.cyanA400} hoverColor={Colors.orange300} />} primaryText='说明文档' />
         </IconMenu></li></ul></div>
         </div>}
             />

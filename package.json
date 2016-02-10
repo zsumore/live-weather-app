@@ -63,6 +63,7 @@
         "react-dom": "^0.14.0",
         "react-tap-event-plugin": "^0.2.0",
         "classnames": "^2.2.0",
-        "react-router": "^1.0.0"
+        "react-router": "^1.0.0",
+        "hint.css": "^2.0.0"
     }
 }
