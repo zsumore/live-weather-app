@@ -4,14 +4,12 @@ var webpack = require('webpack');
 module.exports = {
     devtool: 'source-map',
     entry: [
-        './src/index.jsx',
-        './src/main.css',
-        './src/index.html'
+        './src/app/App.jsx'
     ],
     output: {
         path: path.join(__dirname, 'dist'),
         filename: 'bundle.js',
-        publicPath: '/static/'
+        publicPath: '/build/'
     },
     plugins: [
         new webpack.optimize.OccurenceOrderPlugin(),
@@ -33,10 +31,10 @@ module.exports = {
             include: path.join(__dirname, 'src')
         }, {
             test: /\.html$/,
-            loader: "file?name=[name].[ext]"
+            loader: 'file?name=[name].[ext]'
         }, {
             test: /\.css$/,
-            loader: "file?name=[name].[ext]"
+            loader: 'file?name=[name].[ext]'
         }]
     },
     resolve: {
