@@ -16,7 +16,6 @@ const AppLeftNav = React.createClass({
         docked: React.PropTypes.bool.isRequired,
         history: React.PropTypes.object.isRequired,
         location: React.PropTypes.object.isRequired,
-        onRequestChangeLeftNav: React.PropTypes.func.isRequired,
         onRequestChangeList: React.PropTypes.func.isRequired,
         open: React.PropTypes.bool.isRequired,
         style: React.PropTypes.object
@@ -83,8 +82,8 @@ const AppLeftNav = React.createClass({
             primaryText="大气电场"
             primaryTogglesNestedList={true}
             nestedItems={[
-                <ListItem leftAvatar={<Avatar>H</Avatar>} primaryText="时数据" value="/atmospheric-electric/hour" />,
-                <ListItem leftAvatar={<Avatar>D</Avatar>} primaryText="日数据" value="/atmospheric-electric/date" />
+                <ListItem leftAvatar={<Avatar  backgroundColor={Colors.cyan600}>H</Avatar>} primaryText="时数据" value="/atmospheric-electric/hour" />,
+                <ListItem leftAvatar={<Avatar  backgroundColor={Colors.cyan800}>D</Avatar>} primaryText="日数据" value="/atmospheric-electric/date" />
             ]}
             />
         </SelectableList>

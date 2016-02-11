@@ -20,7 +20,7 @@ const FullWidthSection = React.createClass({
 
     mixins: [
         StylePropable,
-        StyleResizable,
+        StyleResizable
     ],
 
     getDefaultProps() {
@@ -41,12 +41,12 @@ const FullWidthSection = React.createClass({
                 margin: '0 auto'
             },
             rootWhenSmall: {
-                paddingTop: DesktopGutter * 2,
-                paddingBottom: DesktopGutter * 2
+                paddingTop: DesktopGutter * 0.5,
+                paddingBottom: DesktopGutter * 0.5
             },
             rootWhenLarge: {
-                paddingTop: DesktopGutter * 3,
-                paddingBottom: DesktopGutter * 3
+                paddingTop: DesktopGutter * 0.5 ,
+                paddingBottom: DesktopGutter * 0.5 
             },
         };
     },
@@ -75,8 +75,7 @@ const FullWidthSection = React.createClass({
             content = this.props.children;
         }
 
-        return ( < ClearFix {...other
-            }
+        return ( <ClearFix {...other}
             style = {
                 this.mergeStyles(
                     styles.root,

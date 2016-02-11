@@ -1,10 +1,11 @@
 a {
-    color: #ff4081;
+    color: #dde4ec;
     text-decoration: none;
 }
 
 a:hover {
-    text-decoration: underline;
+    color: orange;
+    text-decoration: none;
 }
 
 html {

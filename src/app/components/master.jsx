@@ -5,16 +5,20 @@ import FlatButton from 'material-ui/lib/flat-button';
 import { Spacing } from 'material-ui/lib/styles';
 import { StylePropable, StyleResizable } from 'material-ui/lib/mixins';
 import { Colors, getMuiTheme } from 'material-ui/lib/styles';
+import { Styles } from 'material-ui/lib';
 import IconMenu from 'material-ui/lib/menus/icon-menu';
 import MoreVertIcon from 'material-ui/lib/svg-icons/navigation/more-vert';
 import ActionFavorite from 'material-ui/lib/svg-icons/action/favorite';
 import ContentDrafts from 'material-ui/lib/svg-icons/content/drafts';
+
+import Dialog from 'material-ui/lib/dialog';
 
 import Divider from 'material-ui/lib/divider';
 import MenuItem from 'material-ui/lib/menus/menu-item';
 
 import AppLeftNav from './app-left-nav';
 import FullWidthSection from './full-width-section';
+
 
 function getStyles() {
     const darkWhite = Colors.darkWhite;
@@ -41,9 +45,14 @@ function getStyles() {
             margin: `${Spacing.desktopGutter * 2}px ${Spacing.desktopGutter * 3}px`
         },
         footer: {
+            position: 'fixed',
+            zIndex: 0,
+            bottom: 0,
+            left: 0,
+            width: '100%',
             backgroundColor: Colors.grey900,
             textAlign: 'center',
-            paddingLeft: 256
+            paddingLeft: 280
         },
         a: {
             color: darkWhite
@@ -63,8 +72,12 @@ function getStyles() {
     return styles;
 }
 
-const Master = React.createClass({
 
+const LightTheme = getMuiTheme();
+const DarkTheme = getMuiTheme(Styles.darkBaseTheme);
+
+
+const Master = React.createClass({
     propTypes: {
         children: React.PropTypes.node,
         history: React.PropTypes.object,
@@ -82,9 +95,10 @@ const Master = React.createClass({
 
     getInitialState() {
         return {
-            muiTheme: getMuiTheme(),
+            muiTheme: LightTheme,
             leftNavOpen: true,
-            styles: getStyles()
+            styles: getStyles(),
+            dialogOpen: false
         };
     },
 
@@ -107,55 +121,23 @@ const Master = React.createClass({
         });
     },
 
-    getStyles() {
-        const darkWhite = Colors.darkWhite;
 
-        const styles = {
-            appBar: {
-                position: 'fixed',
-                // Needed to overlap the examples
-                zIndex: this.state.muiTheme.zIndex.appBar + 1,
-                top: 0
-            },
-            leftNav: {
-                zIndex: this.state.muiTheme.zIndex.appBar
-            },
-            root: {
-                paddingTop: Spacing.desktopKeylineIncrement,
-                minHeight: 400,
-                paddingLeft: 256
-            },
-            content: {
-                margin: Spacing.desktopGutter
-            },
-            contentWhenMedium: {
-                margin: `${Spacing.desktopGutter * 2}px ${Spacing.desktopGutter * 3}px`
-            },
-            footer: {
-                backgroundColor: Colors.grey900,
-                textAlign: 'center',
-                paddingLeft: 256
-            },
-            a: {
-                color: darkWhite
-            },
-            p: {
-                margin: '0 auto',
-                padding: 0,
-                color: Colors.lightWhite,
-                maxWidth: 335
-            },
-            iconButton: {
-                color: darkWhite
-            }
-        };
 
-        if (this.isDeviceSize(StyleResizable.statics.Sizes.MEDIUM) ||
-                this.isDeviceSize(StyleResizable.statics.Sizes.LARGE)) {
-            styles.content = this.mergeStyles(styles.content, styles.contentWhenMedium);
+
+    handleMenuItemTap(index, menuItem) {
+
+        if (menuItem.props.value === 'light') {
+
+            this.handleChangeMuiTheme(LightTheme);
+        } else if (menuItem.props.value === 'dark') {
+
+            this.handleChangeMuiTheme(DarkTheme);
+        } else if (menuItem.props.value === 'doc') {
+            this.handleDialogOpen();
+        } else {
+            console.log('[handleMenuItemTap] menuItem.props.value:' + menuItem.props.value);
         }
 
-        return styles;
     },
 
     handleTitleTouchTap() {
@@ -167,11 +149,11 @@ const Master = React.createClass({
         let {leftNavOpen, styles} = this.state;
         if (!leftNavOpen) {
 
-            styles.root.paddingLeft = 256;
-            styles.footer.paddingLeft = 256;
+            styles.root.paddingLeft = 280;
+            styles.footer.paddingLeft = 280;
         } else {
-            styles.root.paddingLeft = 0;
-            styles.footer.paddingLeft = 0;
+            styles.root.paddingLeft = 24;
+            styles.footer.paddingLeft = 24;
         }
 
     },
@@ -180,6 +162,7 @@ const Master = React.createClass({
         this.setState({
             leftNavOpen: open
         });
+
     },
 
     handleRequestChangeList(event, value) {
@@ -192,11 +175,34 @@ const Master = React.createClass({
         });
     },
 
+    handleDialogOpen() {
+
+        this.setState({
+            dialogOpen: true
+        });
+    // console.log(this.state);
+    },
+
+    handleDialogClose() {
+        this.setState({
+            dialogOpen: false
+        });
+    },
+
     render() {
 
         const {history, location, children} = this.props;
 
         let {leftNavOpen, styles} = this.state;
+
+        const actions = [
+            <FlatButton
+            label='确定'
+            primary={true}
+            keyboardFocused={true}
+            onTouchTap={this.handleDialogClose}
+            />
+        ];
 
         return (
             <div>
@@ -208,9 +214,9 @@ const Master = React.createClass({
             iconElementRight={<div style={{
                 float: 'left'
             }}><div className={'menu'
-            }><ul><li><a>天气雷达</a></li><li><IconMenu iconButtonElement={
-            <IconButton className={'hint--bottom'} data-hint={'设置'}><MoreVertIcon /></IconButton>
-            }
+            }><ul><li><a>天气雷达</a></li><li><IconMenu
+            onItemTouchTap={this.handleMenuItemTap}
+            iconButtonElement={<IconButton className={'hint--bottom'} data-hint={'设置'}><MoreVertIcon /></IconButton>}
             targetOrigin={{
                 horizontal: 'left',
                 vertical: 'top'
@@ -220,10 +226,10 @@ const Master = React.createClass({
                 vertical: 'top'
             }}
             >
-        <MenuItem leftIcon={<ActionFavorite color={Colors.grey500} hoverColor={Colors.orange300} />} primaryText='浅色主题' />
-        <MenuItem leftIcon={<ActionFavorite color={Colors.grey900} hoverColor={Colors.orange300} />} primaryText='深色主题' />
+        <MenuItem value='light' leftIcon={<ActionFavorite color={Colors.cyanA200} hoverColor={Colors.orange300} />} primaryText='浅色主题' />
+        <MenuItem value='dark' leftIcon={<ActionFavorite color={Colors.cyanA700} hoverColor={Colors.orange300} />} primaryText='深色主题' />
         <Divider />
-        <MenuItem  leftIcon={<ContentDrafts color={Colors.cyanA400} hoverColor={Colors.orange300} />} primaryText='说明文档' />
+        <MenuItem value='doc' leftIcon={<ContentDrafts color={Colors.greenA400} hoverColor={Colors.orange300} />} primaryText='说明文档' />
         </IconMenu></li></ul></div>
         </div>}
             />
@@ -249,19 +255,18 @@ const Master = React.createClass({
             />
         <FullWidthSection style={styles.footer}>
           <p style={this.prepareStyles(styles.p)}>
-            {'Hand crafted with love by the engineers at '}
-            <a style={styles.a} href="http://call-em-all.com">
-              Call-Em-All
-            </a>
-            {' and our awesome '}
-            <a
-            style={this.prepareStyles(styles.a)}
-            href="https://github.com/callemall/material-ui/graphs/contributors"
-            >
-              contributors
-            </a>.
+            版权所有© <a href='http://www.fs121.com' target='_blank' className={'hint--right hint--info'} data-hint={'佛山市气象公众网'}>佛山市气象局</a>
           </p>
         </FullWidthSection>
+        <Dialog
+            title='使用说明'
+            actions={actions}
+            modal={false}
+            open={this.state.dialogOpen}
+            onRequestClose={this.handleDialogClose}
+            >
+          <div>1、点击标题“佛山气象数据展示平台”隐藏/展示左侧导航栏。</div>
+        </Dialog>
       </div>
             );
     },
