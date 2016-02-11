@@ -1,6 +1,7 @@
 import React from 'react';
-import echarts from 'echarts/lib/echarts';
+import echarts from 'echarts/echarts-all';
 import { StylePropable, StyleResizable } from 'material-ui/lib/mixins';
+import request from 'superagent/lib/client';
 
 const AtmosphericElectricHourPage = React.createClass({
 
@@ -15,8 +16,8 @@ const AtmosphericElectricHourPage = React.createClass({
 
     getInitialState() {
         return {
-            mapChart: '',
-            mapChartOption: ''
+            mapChart: {},
+            mapChartOption: {}
 
         };
     },
@@ -43,17 +44,30 @@ const AtmosphericElectricHourPage = React.createClass({
         });
         */
     componentDidMount() {
-        this.state.mapChart = echarts.init(document.getElementById('AtmosphericElectricHourPage.mapChart'));
-        console.log('hello world!');
+        const mapChart = this.state.mapChart = echarts.init(document.getElementById('AtmosphericElectricHourPage.mapChart'));
+        request.get('map/json/440600.json').end(function(err, res) {
+            //console.log(res);
+            //console.log(res.text);
+
+            echarts.registerMap('foshan', res.text);
+            mapChart.setOption({
+                series: [{
+                    type: 'map',
+                    map: 'foshan'
+                }]
+            });
+        });
+
     },
 
     render() {
         return (
             <div><h2 className='page-title'>大气电场时数据</h2>
+            <div>hello</div>
             <div id='AtmosphericElectricHourPage.mapChart' style={{
                 width: '80%',
                 height: 600
-            }}>hello
+            }}>
         </div>
         </div>);
     }
