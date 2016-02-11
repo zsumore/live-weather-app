@@ -25,17 +25,27 @@ module.exports = {
         })
     ],
     module: {
-        loaders: [{
-            test: /\.js$/,
-            loaders: ['babel'],
-            include: path.join(__dirname, 'src')
-        }, {
-            test: /\.html$/,
-            loader: 'file?name=[name].[ext]'
-        }, {
-            test: /\.css$/,
-            loader: 'file?name=[name].[ext]'
-        }]
+        loaders: [
+            {
+                test: /\.jsx?$/,
+                exclude: /(node_modules|bower_components)/,
+                loader: 'babel',
+                query: {
+                    presets: ['es2015', 'stage-0', 'react']
+                },
+                include: path.join(__dirname, 'src/app/')
+            },
+            {
+                test: /\.js$/,
+                loaders: ['babel'],
+                include: path.join(__dirname, 'src/app/')
+            }, {
+                test: /\.html$/,
+                loader: 'file?name=[name].[ext]'
+            }, {
+                test: /\.css$/,
+                loader: 'file?name=[name].[ext]'
+            }]
     },
     resolve: {
         extensions: ['', '.js', '.jsx']
