@@ -2,27 +2,20 @@ var path = require('path');
 var webpack = require('webpack');
 
 module.exports = {
-    devtool: 'source-map',
+    evtool: 'cheap-module-eval-source-map',
     entry: [
+        'eventsource-polyfill', // necessary for hot reloading with IE
+        'webpack-hot-middleware/client',
         './src/app/App.jsx'
     ],
     output: {
         path: path.join(__dirname, 'dist'),
         filename: 'bundle.js',
-        publicPath: '/build/'
+        publicPath: '/static/'
     },
     plugins: [
-        new webpack.optimize.OccurenceOrderPlugin(),
-        new webpack.DefinePlugin({
-            'process.env': {
-                'NODE_ENV': JSON.stringify('production')
-            }
-        }),
-        new webpack.optimize.UglifyJsPlugin({
-            compressor: {
-                warnings: false
-            }
-        })
+        new webpack.HotModuleReplacementPlugin(),
+        new webpack.NoErrorsPlugin()
     ],
     module: {
         loaders: [
@@ -38,7 +31,7 @@ module.exports = {
             {
                 test: /\.js$/,
                 loaders: ['babel'],
-                include: path.join(__dirname, 'src/app/')
+                include: path.join(__dirname, 'src')
             }, {
                 test: /\.html$/,
                 loader: 'file?name=[name].[ext]'
