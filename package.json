@@ -64,6 +64,7 @@
     "react-addons-transition-group": "^0.14.0",
     "react-addons-update": "^0.14.0",
     "react-dom": "^0.14.0",
+    "react-layout-components": "^2.1.2",
     "react-router": "^1.0.0",
     "react-tap-event-plugin": "^0.2.0",
     "superagent": "^1.7.2"

@@ -90,7 +90,7 @@ const Master = React.createClass({
 
     mixins: [
         StylePropable,
-        StyleResizable,
+        StyleResizable
     ],
 
     getInitialState() {
@@ -104,20 +104,20 @@ const Master = React.createClass({
 
     getChildContext() {
         return {
-            muiTheme: this.state.muiTheme,
+            muiTheme: this.state.muiTheme
         };
     },
 
     componentWillMount() {
         this.setState({
-            muiTheme: this.state.muiTheme,
+            muiTheme: this.state.muiTheme
         });
     },
 
     componentWillReceiveProps(nextProps, nextContext) {
         const newMuiTheme = nextContext.muiTheme ? nextContext.muiTheme : this.state.muiTheme;
         this.setState({
-            muiTheme: newMuiTheme,
+            muiTheme: newMuiTheme
         });
     },
 
@@ -155,7 +155,6 @@ const Master = React.createClass({
             styles.root.paddingLeft = 24;
             styles.footer.paddingLeft = 24;
         }
-
     },
 
     handleChangeRequestLeftNav(open) {
@@ -239,6 +238,7 @@ const Master = React.createClass({
             <div style={this.prepareStyles(styles.content)}>
               {React.cloneElement(children, {
                 onChangeMuiTheme: this.handleChangeMuiTheme,
+                isLeftNavClose: this.state.leftNavOpen
             })}
             </div>
           </div>
