@@ -1,7 +1,15 @@
 import React from 'react';
 import echarts from 'echarts/echarts-line-map';
+
 import { ClearFix } from 'material-ui';
 import { StylePropable, StyleResizable } from 'material-ui/lib/mixins';
+import Table from 'material-ui/lib/table/table';
+import TableHeaderColumn from 'material-ui/lib/table/table-header-column';
+import TableRow from 'material-ui/lib/table/table-row';
+import TableHeader from 'material-ui/lib/table/table-header';
+import TableRowColumn from 'material-ui/lib/table/table-row-column';
+import TableBody from 'material-ui/lib/table/table-body';
+
 import request from 'superagent/lib/client';
 import { Box } from 'react-layout-components/lib';
 
@@ -17,7 +25,9 @@ function getLineChartHeight() {
     return getMapChartHeight() * 0.6;
 }
 
-function getLineChartWidth() {
+function getLineChartWidth(isClose) {
+    if (isClose)
+        return window.innerWidth - getMapChartWidth();
     return window.innerWidth - 280 - getMapChartWidth();
 }
 
@@ -152,6 +162,39 @@ const lineChartOption = {
 };
 
 
+const tableData = [
+    {
+        name: 'John Smith',
+        status: 'Employed',
+        selected: true,
+    },
+    {
+        name: 'Randal White',
+        status: 'Unemployed',
+    },
+    {
+        name: 'Stephanie Sanders',
+        status: 'Employed',
+        selected: true,
+    },
+    {
+        name: 'Steve Brown',
+        status: 'Employed',
+    },
+    {
+        name: 'Joyce Whitten',
+        status: 'Employed',
+    },
+    {
+        name: 'Samuel Roberts',
+        status: 'Employed',
+    },
+    {
+        name: 'Adam Moore',
+        status: 'Employed',
+    }
+];
+
 const AtmosphericElectricHourPage = React.createClass({
 
 
@@ -159,6 +202,7 @@ const AtmosphericElectricHourPage = React.createClass({
     propTypes: {
         onChangeMuiTheme: React.PropTypes.func,
         isLeftNavClose: React.PropTypes.bool
+
     },
 
     contextTypes: {
@@ -167,6 +211,7 @@ const AtmosphericElectricHourPage = React.createClass({
 
     getInitialState() {
         return {
+            leftNavClose: true,
             mapChart: {},
             mapChartOption: {},
             mapChartHeight: getMapChartHeight(),
@@ -174,8 +219,7 @@ const AtmosphericElectricHourPage = React.createClass({
             lineChart: {},
             lineChartOption: lineChartOption,
             lineChartHeight: getLineChartHeight(),
-            lineChartWidth: getLineChartWidth(),
-            leftNavClose: true
+            lineChartWidth: getLineChartWidth(true)
         };
     },
 
@@ -192,9 +236,17 @@ const AtmosphericElectricHourPage = React.createClass({
         const newMuiTheme = nextContext.muiTheme ? nextContext.muiTheme : this.state.muiTheme;
         this.setState({
             muiTheme: newMuiTheme,
-            leftNavClose: this.props.isLeftNavClose !== nextProps.isLeftNavClose ? nextProps.isLeftNavClose : this.state.leftNavClose
+            leftNavClose: this.props.isLeftNavClose !== nextProps.isLeftNavClose ? nextProps.isLeftNavClose : this.state.leftNavClose,
+        //   mapChartHeight: getMapChartHeight(),
+        //   mapChartWidth: getMapChartWidth(),
+        //   lineChartHeight: getLineChartHeight(),
+        // lineChartWidth: getLineChartWidth(this.state.leftNavClose)
         });
-        console.log(this.state.leftNavClose);
+
+        this.state.lineChart.resize();
+
+        console.log(this.state);
+
     },
 
 
@@ -222,12 +274,58 @@ const AtmosphericElectricHourPage = React.createClass({
             <div><h2 className='page-title'>大气电场时数据</h2>
             
             <Box width='100%' height='100%' justifyContent='space-around' alignItems='flex-start'  column={false} reverse={false}>
-            <Box id='AtmosphericElectricHourPage.lineChart' flex={1} style={{
+            <Box  flex={1} style={{
                 width: this.state.lineChartWidth,
-                height: this.state.lineChartHeight
+                height: this.state.mapChartHeight
+            }} column>
+             <Box id='AtmosphericElectricHourPage.lineChart'  style={{
+                width: '100%',
+                height: this.state.mapChartHeight * 0.6
             }}>
+
             </Box>
-            <Box id='AtmosphericElectricHourPage.mapChart' flex={1}  style={{
+             <Box style={{
+                width: '100%',
+                height: this.state.mapChartHeight * 0.4
+            }}>
+          <Table
+            height={'100%'}
+            fixedHeader={false}
+            selectable={true}
+            multiSelectable={false}
+            onRowSelection={this._onRowSelection}
+            >
+          <TableHeader enableSelectAll={false}>
+            <TableRow>
+              <TableHeaderColumn colSpan="3" tooltip="Super Header" style={{
+                textAlign: 'center'
+            }}>
+                Super Header
+              </TableHeaderColumn>
+            </TableRow>
+            <TableRow>
+              <TableHeaderColumn tooltip="The ID">ID</TableHeaderColumn>
+              <TableHeaderColumn tooltip="The Name">Name</TableHeaderColumn>
+              <TableHeaderColumn tooltip="The Status">Status</TableHeaderColumn>
+            </TableRow>
+          </TableHeader>
+          <TableBody
+            deselectOnClickaway={true}
+            showRowHover={true}
+            stripedRows={true}
+            >
+            {tableData.map((row, index) => (
+            <TableRow key={index} selected={row.selected}>
+                <TableRowColumn>{index}</TableRowColumn>
+                <TableRowColumn>{row.name}</TableRowColumn>
+                <TableRowColumn>{row.status}</TableRowColumn>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+             </Box>
+            </Box>
+            <Box id='AtmosphericElectricHourPage.mapChart'   style={{
                 width: this.state.mapChartWidth,
                 height: this.state.mapChartHeight
             }}></Box>
