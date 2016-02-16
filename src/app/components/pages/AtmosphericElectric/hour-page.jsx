@@ -13,6 +13,14 @@ import TableBody from 'material-ui/lib/table/table-body';
 import request from 'superagent/lib/client';
 import { Box } from 'react-layout-components/lib';
 
+import DatePicker from 'material-ui/lib/date-picker/date-picker';
+import Toolbar from 'material-ui/lib/toolbar/toolbar';
+import ToolbarGroup from 'material-ui/lib/toolbar/toolbar-group';
+import ToolbarSeparator from 'material-ui/lib/toolbar/toolbar-separator';
+
+import Datetime from 'react-datetime';
+
+
 function getMapChartHeight() {
     return window.innerHeight - 250;
 }
@@ -164,7 +172,7 @@ function convertData(data) {
             let geoStaion = geoStationMap[data[i].sid];
             if (geoStaion) {
                 // let _concatValue=geoCoord.concat(data[i].value);
-              
+
                 res.push({
                     name: data[i].sid,
                     value: geoCoord.concat(data[i].value)
@@ -172,7 +180,7 @@ function convertData(data) {
             }
         }
     }
-  
+
     return res;
 }
 ;
@@ -524,14 +532,27 @@ const AtmosphericElectricHourPage = React.createClass({
                 <TableRowColumn>{row.status}</TableRowColumn>
               </TableRow>
             ))}
-          </TableBody>
-        </Table>
+            </TableBody>
+            </Table>
              </Box>
+            </Box>
+            <Box style={{
+                width: this.state.mapChartHeight,
+                height: this.state.mapChartHeight + 50
+            }} column>
+            <Box width='100%'>
+            <Toolbar>
+            <ToolbarGroup  float="left">
+            <Datetime dateFormat='YYYY-MM-DD' timeFormat='HH:mm:ss' />
+            </ToolbarGroup>
+            </Toolbar>
+
             </Box>
             <Box id='AtmosphericElectricHourPage.mapChart'   style={{
                 width: this.state.mapChartHeight,
                 height: this.state.mapChartHeight
-            }}></Box>
+            }} />
+            </Box>
             </Box>
          
     
