@@ -7,6 +7,9 @@ require('./lib/chart/line');
 require('./lib/chart/map');
 require('./lib/component/geo');
 
+require('./lib/chart/scatter');
+require('./lib/component/visualMap');
+
 
 require('./lib/component/tooltip');
 require('./lib/component/legend');

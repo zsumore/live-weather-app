@@ -17,18 +17,10 @@ function getMapChartHeight() {
     return window.innerHeight - 250;
 }
 
-function getMapChartWidth() {
-    return getMapChartHeight();
-}
-
-function getLineChartHeight() {
-    return getMapChartHeight() * 0.6;
-}
-
 function getLineChartWidth(isClose) {
     if (isClose)
-        return window.innerWidth - getMapChartWidth();
-    return window.innerWidth - 280 - getMapChartWidth();
+        return window.innerWidth - getMapChartHeight();
+    return window.innerWidth - 280 - getMapChartHeight();
 }
 
 const lineChartOption = {
@@ -161,6 +153,164 @@ const lineChartOption = {
     ]
 };
 
+function convertData(data) {
+    let res = [];
+    for (let i = 0; i < data.length; i++) {
+
+        let geoCoord = geoCoordMap[data[i].sid];
+
+        if (geoCoord) {
+
+            let geoStaion = geoStationMap[data[i].sid];
+            if (geoStaion) {
+                // let _concatValue=geoCoord.concat(data[i].value);
+              
+                res.push({
+                    name: data[i].sid,
+                    value: geoCoord.concat(data[i].value)
+                });
+            }
+        }
+    }
+  
+    return res;
+}
+;
+
+const geoCoordMap = {
+    '59828': [113.115, 23.0145],
+    'AE2267': [113.1333, 23.0336],
+    'AE2213': [113.113, 23.05],
+    'AE6834': [113.1389, 23.1333],
+    'AE2264': [112.9997, 22.9494],
+    'AE2262': [113, 23.117],
+    'AE2270': [113.0483, 23.0619],
+    'AE2229': [112.867, 23.183],
+    'AE6963': [112.8631, 23.0717],
+    'AE6946': [112.9094, 23.3811],
+    'AE2224': [112.855, 23.5058],
+    'AE6949': [112.9728, 23.3078],
+    'AE7019': [112.895, 22.8886],
+    'AE7032': [112.7142, 22.8631],
+    'AE7031': [112.4508, 22.7497],
+    '59288': [113.0086, 23.1447]
+}
+
+const geoStationMap = {
+    '59828': '佛山气象局（季华）',
+    'AE2267': '南海区三防办',
+    'AE2213': '南海气象局测站(桂城)',
+    'AE6834': '南海雅瑶小学',
+    'AE2264': '南海官山大泵站',
+    'AE2262': '南海官窑水利所',
+    'AE2270': '南海罗村水利所',
+    'AE2229': '三水气象局',
+    'AE6963': '三水白泥小学',
+    'AE6946': '三水上塘村委',
+    'AE2224': '三水迳口南山小学',
+    'AE6949': '三水范湖工业园',
+    'AE7019': '高明气象局',
+    'AE7032': '高明明城三防中心',
+    'AE7031': '高明更合镇吉田村委会',
+    '59288': '南海狮山测站'
+}
+
+const mapChartOption = {
+    backgroundColor: '#404a59',
+    title: {
+        text: '佛山大气电场预警',
+        left: 'center',
+        textStyle: {
+            color: '#fff'
+        }
+    },
+    tooltip: {
+        trigger: 'item',
+        formatter: function(params, ticket, callback) {
+
+            let content = '站点：' + geoStationMap[params.name] + '<br />' + '经纬度：' + params.value[0] + ',' + params.value[1] + '<br />' + '预警值：' + params.value[2];
+
+            return content;
+        }
+    },
+    legend: {
+        orient: 'vertical',
+        top: 'bottom',
+        left: 'right',
+        data: ['大气电场'],
+        textStyle: {
+            color: '#fff'
+        }
+    },
+    visualMap: {
+        type: 'piecewise',
+        pieces: [{
+            min: 30,
+            color: '#ff5252'
+        }, {
+            min: 20,
+            max: 30,
+            color: '#ffab40'
+        }, {
+            min: 10,
+            max: 20,
+            color: '#ffff00'
+        }, {
+            min: 0,
+            max: 10,
+            color: '#40c4ff'
+        }, {
+            max: 0,
+            color: '#fafafa'
+        }],
+        calculable: true,
+        //color: ['#d94e5d', '#eac736', '#50a3ba'],
+        textStyle: {
+            color: '#fff'
+        }
+    },
+    geo: {
+        map: 'foshan',
+        label: {
+            emphasis: {
+                show: false
+            }
+        },
+        itemStyle: {
+            normal: {
+                areaColor: '#323c48',
+                borderColor: '#111'
+            },
+            emphasis: {
+                areaColor: '#2a333d'
+            }
+        }
+    },
+    series: [
+        {
+            name: '大气电场',
+            type: 'scatter',
+            coordinateSystem: 'geo',
+            data: [],
+            symbolSize: 10,
+            label: {
+                normal: {
+                    show: false
+                },
+                emphasis: {
+                    show: false
+                }
+            },
+            itemStyle: {
+                emphasis: {
+                    borderColor: '#fff',
+                    borderWidth: 1
+                }
+            }
+        }
+    ]
+}
+
 
 const tableData = [
     {
@@ -215,10 +365,8 @@ const AtmosphericElectricHourPage = React.createClass({
             mapChart: {},
             mapChartOption: {},
             mapChartHeight: getMapChartHeight(),
-            mapChartWidth: getMapChartWidth(),
             lineChart: {},
             lineChartOption: lineChartOption,
-            lineChartHeight: getLineChartHeight(),
             lineChartWidth: getLineChartWidth(true)
         };
     },
@@ -236,16 +384,13 @@ const AtmosphericElectricHourPage = React.createClass({
         const newMuiTheme = nextContext.muiTheme ? nextContext.muiTheme : this.state.muiTheme;
         this.setState({
             muiTheme: newMuiTheme,
-            leftNavClose: this.props.isLeftNavClose !== nextProps.isLeftNavClose ? nextProps.isLeftNavClose : this.state.leftNavClose,
-        //   mapChartHeight: getMapChartHeight(),
-        //   mapChartWidth: getMapChartWidth(),
-        //   lineChartHeight: getLineChartHeight(),
-        // lineChartWidth: getLineChartWidth(this.state.leftNavClose)
+            leftNavClose: this.props.isLeftNavClose !== nextProps.isLeftNavClose ? nextProps.isLeftNavClose : this.state.leftNavClose
+
         });
 
         this.state.lineChart.resize();
 
-        console.log(this.state);
+
 
     },
 
@@ -254,15 +399,73 @@ const AtmosphericElectricHourPage = React.createClass({
 
 
         const mapChart = this.state.mapChart = echarts.init(document.getElementById('AtmosphericElectricHourPage.mapChart'));
+        mapChart.on('click', function(param) {
+            let selected = param;
+            console.log(selected);
+        });
         request.get('map/json/440600.json').end(function(err, res) {
 
+
             echarts.registerMap('foshan', res.text);
-            mapChart.setOption({
-                series: [{
-                    type: 'map',
-                    map: 'foshan'
-                }]
-            });
+            mapChartOption.series[0].data = convertData([
+                {
+                    sid: '59828',
+                    value: 30
+                },
+                {
+                    sid: 'AE2267',
+                    value: 20
+                },
+                {
+                    sid: 'AE2213',
+                    value: 30
+                },
+                {
+                    sid: 'AE6834',
+                    value: 32
+                }, {
+                    sid: 'AE2264',
+                    value: 0
+                },
+                {
+                    sid: 'AE2262',
+                    value: -1
+                },
+                {
+                    sid: 'AE2270',
+                    value: 18
+                }, {
+                    sid: 'AE2229',
+                    value: 9
+                },
+                {
+                    sid: 'AE6963',
+                    value: 22
+                },
+                {
+                    sid: 'AE6946',
+                    value: 20
+                }, {
+                    sid: 'AE2224',
+                    value: 10
+                },
+                {
+                    sid: 'AE6949',
+                    value: 12
+                },
+                {
+                    sid: 'AE7019',
+                    value: -999
+                }, {
+                    sid: 'AE7032',
+                    value: 9
+                },
+                {
+                    sid: 'AE7031',
+                    value: 25
+                }
+            ]);
+            mapChart.setOption(mapChartOption);
         });
         const lineChart = this.state.lineChart = echarts.init(document.getElementById('AtmosphericElectricHourPage.lineChart'));
         lineChart.setOption(this.state.lineChartOption);
@@ -304,7 +507,7 @@ const AtmosphericElectricHourPage = React.createClass({
               </TableHeaderColumn>
             </TableRow>
             <TableRow>
-              <TableHeaderColumn tooltip="The ID">ID</TableHeaderColumn>
+              <TableHeaderColumn tooltip="站名">站名</TableHeaderColumn>
               <TableHeaderColumn tooltip="The Name">Name</TableHeaderColumn>
               <TableHeaderColumn tooltip="The Status">Status</TableHeaderColumn>
             </TableRow>
@@ -326,7 +529,7 @@ const AtmosphericElectricHourPage = React.createClass({
              </Box>
             </Box>
             <Box id='AtmosphericElectricHourPage.mapChart'   style={{
-                width: this.state.mapChartWidth,
+                width: this.state.mapChartHeight,
                 height: this.state.mapChartHeight
             }}></Box>
             </Box>
