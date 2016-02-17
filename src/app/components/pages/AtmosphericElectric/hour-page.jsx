@@ -9,16 +9,26 @@ import TableRow from 'material-ui/lib/table/table-row';
 import TableHeader from 'material-ui/lib/table/table-header';
 import TableRowColumn from 'material-ui/lib/table/table-row-column';
 import TableBody from 'material-ui/lib/table/table-body';
+import Colors from 'material-ui/lib/styles/colors';
 
-import request from 'superagent/lib/client';
-import { Box } from 'react-layout-components/lib';
-
-import DatePicker from 'material-ui/lib/date-picker/date-picker';
 import Toolbar from 'material-ui/lib/toolbar/toolbar';
 import ToolbarGroup from 'material-ui/lib/toolbar/toolbar-group';
 import ToolbarSeparator from 'material-ui/lib/toolbar/toolbar-separator';
 
+import NavigationRefresh from 'material-ui/lib/svg-icons/navigation/refresh';
+import NavigationChevronLeft from 'material-ui/lib/svg-icons/navigation/chevron-left';
+import NavigationChevronRight from 'material-ui/lib/svg-icons/navigation/chevron-right';
+import NavigationArrowBack from 'material-ui/lib/svg-icons/navigation/arrow-back';
+import NavigationArrowForward from 'material-ui/lib/svg-icons/navigation/arrow-forward';
+import IconButton from 'material-ui/lib/icon-button';
+
+
+
+import request from 'superagent/lib/client';
+import { Box } from 'react-layout-components/lib';
+
 import Datetime from 'react-datetime';
+import zh_cn from 'moment/locale/zh-cn';
 
 
 function getMapChartHeight() {
@@ -31,6 +41,10 @@ function getLineChartWidth(isClose) {
     return window.innerWidth - 280 - getMapChartHeight();
 }
 
+const iconStyles = {
+    marginTop: 8
+};
+
 const lineChartOption = {
     title: {
         text: '雨量流量关系图',
@@ -40,6 +54,26 @@ const lineChartOption = {
     },
     grid: {
         bottom: 80
+    },
+
+    toolbox: {
+        show: true,
+        orient: 'vertical',
+        top: 'top',
+        left: 'right',
+        feature: {
+            dataZoom: {
+                show: true
+            },
+            dataView: {
+                show: true
+            },
+            magicType: {
+                show: false
+            },
+            restore: {},
+            saveAsImage: {}
+        }
     },
     tooltip: {
         trigger: 'axis',
@@ -54,7 +88,9 @@ const lineChartOption = {
     },
     legend: {
         data: ['流量'],
-        x: 'left'
+
+        top: 'top',
+        left: 'left'
     },
     dataZoom: [
         {
@@ -185,6 +221,28 @@ function convertData(data) {
 }
 ;
 
+function getWarnData(data) {
+    let res = [];
+    for (let i = 0; i < data.length; i++) {
+        if (data[i].value[2] > 20) {
+            res.push(data[i]);
+        }
+    }
+    return res;
+}
+;
+
+function getNormalData(data) {
+    let res = [];
+    for (let i = 0; i < data.length; i++) {
+        if (data[i].value[2] <= 20) {
+            res.push(data[i]);
+        }
+    }
+    return res;
+}
+;
+
 const geoCoordMap = {
     '59828': [113.115, 23.0145],
     'AE2267': [113.1333, 23.0336],
@@ -241,14 +299,59 @@ const mapChartOption = {
             return content;
         }
     },
+    toolbox: {
+        show: true,
+        orient: 'vertical',
+        top: 'top',
+        left: 'right',
+        feature: {
+            dataZoom: {
+                show: false
+            },
+            dataView: {
+                show: true
+            },
+            magicType: {
+                show: false
+            },
+            restore: {
+                show: false
+            },
+            saveAsImage: {
+                backgroundColor: 'white'
+            }
+        },
+        iconStyle: {
+            normal: {
+                borderColor: '#eceff1',
+                color: 'none'
+            },
+            emphasis: {
+                borderColor: '#3E98C5'
+            }
+        }
+    },
     legend: {
         orient: 'vertical',
         top: 'bottom',
         left: 'right',
-        data: ['大气电场'],
-        textStyle: {
-            color: '#fff'
+        data: [{
+            name: '橙色以上',
+            // 强制设置图形为圆。
+            icon: 'circle',
+            textStyle: {
+                color: 'white'
+            }
         }
+            , {
+                name: '黄色以下',
+                icon: 'circle',
+                // 设置文本为红色
+                textStyle: {
+                    color: 'white'
+                }
+            }]
+
     },
     visualMap: {
         type: 'piecewise',
@@ -296,25 +399,67 @@ const mapChartOption = {
     },
     series: [
         {
-            name: '大气电场',
+            name: '黄色以下',
             type: 'scatter',
             coordinateSystem: 'geo',
             data: [],
             symbolSize: 10,
             label: {
                 normal: {
-                    show: false
+                    formatter: '{b}',
+                    position: 'right',
+                    show: false,
+                    formatter: function(params, ticket, callback) {
+
+                        return geoStationMap[params.name];
+                    }
                 },
                 emphasis: {
-                    show: false
+                    show: true,
+                    formatter: function(params, ticket, callback) {
+
+                        return geoStationMap[params.name];
+                    }
                 }
             },
             itemStyle: {
-                emphasis: {
-                    borderColor: '#fff',
-                    borderWidth: 1
+                normal: {
+                    color: '#ffff00'
                 }
-            }
+            },
+            color: ['#ffff00']
+        },
+        {
+            name: '橙色以上',
+            type: 'effectScatter',
+            coordinateSystem: 'geo',
+            data: [],
+            symbolSize: 10,
+            showEffectOn: 'render',
+            rippleEffect: {
+                brushType: 'stroke'
+            },
+            hoverAnimation: true,
+            label: {
+                normal: {
+                    formatter: '{b}',
+                    position: 'right',
+                    show: true,
+                    formatter: function(params, ticket, callback) {
+
+                        return geoStationMap[params.name];
+                    }
+                }
+            },
+            itemStyle: {
+                normal: {
+                    color: '#ffab40',
+                    shadowBlur: 10,
+                    shadowColor: '#333'
+                }
+            },
+            zlevel: 1,
+            color: ['#ffab40']
         }
     ]
 }
@@ -388,6 +533,12 @@ const AtmosphericElectricHourPage = React.createClass({
 
     },
 
+    handleChangeTimeByMinute(event) {
+
+        console.log('调整时间:' + event.target.value);
+
+    },
+
     componentWillReceiveProps(nextProps, nextContext) {
         const newMuiTheme = nextContext.muiTheme ? nextContext.muiTheme : this.state.muiTheme;
         this.setState({
@@ -415,7 +566,7 @@ const AtmosphericElectricHourPage = React.createClass({
 
 
             echarts.registerMap('foshan', res.text);
-            mapChartOption.series[0].data = convertData([
+            mapChartOption.series[0].data = getNormalData(convertData([
                 {
                     sid: '59828',
                     value: 30
@@ -472,7 +623,65 @@ const AtmosphericElectricHourPage = React.createClass({
                     sid: 'AE7031',
                     value: 25
                 }
-            ]);
+            ]));
+            mapChartOption.series[1].data = getWarnData(convertData([
+                {
+                    sid: '59828',
+                    value: 30
+                },
+                {
+                    sid: 'AE2267',
+                    value: 20
+                },
+                {
+                    sid: 'AE2213',
+                    value: 30
+                },
+                {
+                    sid: 'AE6834',
+                    value: 32
+                }, {
+                    sid: 'AE2264',
+                    value: 0
+                },
+                {
+                    sid: 'AE2262',
+                    value: -1
+                },
+                {
+                    sid: 'AE2270',
+                    value: 18
+                }, {
+                    sid: 'AE2229',
+                    value: 9
+                },
+                {
+                    sid: 'AE6963',
+                    value: 22
+                },
+                {
+                    sid: 'AE6946',
+                    value: 20
+                }, {
+                    sid: 'AE2224',
+                    value: 10
+                },
+                {
+                    sid: 'AE6949',
+                    value: 12
+                },
+                {
+                    sid: 'AE7019',
+                    value: -999
+                }, {
+                    sid: 'AE7032',
+                    value: 9
+                },
+                {
+                    sid: 'AE7031',
+                    value: 25
+                }
+            ]));
             mapChart.setOption(mapChartOption);
         });
         const lineChart = this.state.lineChart = echarts.init(document.getElementById('AtmosphericElectricHourPage.lineChart'));
@@ -484,23 +693,24 @@ const AtmosphericElectricHourPage = React.createClass({
         return (
             <div><h2 className='page-title'>大气电场时数据</h2>
             
-            <Box width='100%' height='100%' justifyContent='space-around' alignItems='flex-start'  column={false} reverse={false}>
+            <Box width='100%'  justifyContent='space-around' alignItems='flex-start'  column={false} reverse={false}>
             <Box  flex={1} style={{
                 width: this.state.lineChartWidth,
-                height: this.state.mapChartHeight
+                height: this.state.mapChartHeight + 50
             }} column>
              <Box id='AtmosphericElectricHourPage.lineChart'  style={{
-                width: '100%',
-                height: this.state.mapChartHeight * 0.6
+                width: '95%',
+                height: (this.state.mapChartHeight + 50) * 0.6
             }}>
 
             </Box>
-             <Box style={{
-                width: '100%',
-                height: this.state.mapChartHeight * 0.4
+            <Box style={{
+                width: '95%',
+                height: (this.state.mapChartHeight + 50) * 0.4,
+                marginRight: 50
             }}>
           <Table
-            height={'100%'}
+            width={'100%'}
             fixedHeader={false}
             selectable={true}
             multiSelectable={false}
@@ -540,13 +750,26 @@ const AtmosphericElectricHourPage = React.createClass({
                 width: this.state.mapChartHeight,
                 height: this.state.mapChartHeight + 50
             }} column>
-            <Box width='100%'>
-            <Toolbar>
-            <ToolbarGroup  float="left">
-            <Datetime dateFormat='YYYY-MM-DD' timeFormat='HH:mm:ss' />
-            </ToolbarGroup>
-            </Toolbar>
-
+            <Box width='100%' alignItems='center' style={{
+                height: 50
+            }}>
+            <IconButton tooltip="-5分钟" touch={true}  value={-5} tooltipPosition='top-center' onClick={this.handleChangeTimeByMinute} >
+            <NavigationArrowBack  />
+            </IconButton>
+            <IconButton tooltip="-1分钟"  tooltipPosition='top-center'>
+            <NavigationChevronLeft  />
+            </IconButton>
+            <Datetime dateFormat='YYYY-MM-DD' timeFormat='HH:mm' locale='zh_cn' />
+            <IconButton tooltip="+1分钟" tooltipPosition='top-center'>
+            <NavigationChevronRight />
+            </IconButton>
+            <IconButton tooltip="+5分钟" touch={true} tooltipPosition='top-center'>
+            <NavigationArrowForward />
+            </IconButton>
+            <IconButton tooltip="刷新" touch={true} tooltipPosition='top-center'>
+            <NavigationRefresh color={Colors.green500} />
+            </IconButton>
+           
             </Box>
             <Box id='AtmosphericElectricHourPage.mapChart'   style={{
                 width: this.state.mapChartHeight,

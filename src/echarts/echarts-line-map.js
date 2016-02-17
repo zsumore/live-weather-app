@@ -19,7 +19,7 @@ require('./lib/component/title');
 
 
 require('./lib/component/dataZoom');
-
+require('./lib/component/toolbox');
 
 require('zrenderjs/vml/vml');
 
