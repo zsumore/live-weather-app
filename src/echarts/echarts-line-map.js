@@ -5,9 +5,10 @@ require('./lib/chart/line');
 
 
 require('./lib/chart/map');
-require('./lib/component/geo');
-
 require('./lib/chart/scatter');
+require('./lib/chart/effectScatter');
+
+require('./lib/component/geo');
 require('./lib/component/visualMap');
 
 
@@ -16,6 +17,7 @@ require('./lib/component/legend');
 
 require('./lib/component/grid');
 require('./lib/component/title');
+
 
 
 require('./lib/component/dataZoom');

@@ -41,8 +41,6 @@ const AtmosphericElectricDatePage = React.createClass({
 
 
 
-
-
     componentDidMount() {
         const mapChart = this.state.mapChart = echarts.init(document.getElementById('AtmosphericElectricHourPage.mapChart'));
         request.get('map/json/440600.json').end(function(err, res) {
@@ -55,9 +53,6 @@ const AtmosphericElectricDatePage = React.createClass({
                 }]
             });
         });
-        console.log('-----------' + this.state.mapChartHeight);
-        console.log('-----------' + this.state.mapChartWidth);
-
 
     },
 

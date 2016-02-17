@@ -67,13 +67,12 @@ const FullWidthSection = React.createClass({
         return ( <ClearFix {...other}
             style = {
             this.mergeStyles(
-                styles.root,
-                style,
+                styles.root, style,
                 this.isDeviceSize(StyleResizable.statics.Sizes.SMALL) && styles.rootWhenSmall,
                 this.isDeviceSize(StyleResizable.statics.Sizes.LARGE) && styles.rootWhenLarge)
             } > {
             content
-            } < /ClearFix>
+            } </ClearFix>
             );
     },
 });
