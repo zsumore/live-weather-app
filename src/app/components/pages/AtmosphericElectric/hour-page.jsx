@@ -170,6 +170,15 @@ const AtmosphericElectricHourPage = React.createClass({
     handleChangeTimeByMinute(event) {
 
         console.log('调整时间:' + event.target.value);
+        let _time = new Date();
+        _time.setTime(this.state.dateTime.getTime());
+        console.log(_time);
+        console.log(_time.getMinutes() + parseInt(event.target.value));
+        _time.setMinutes(_time.getMinutes() + parseInt(event.target.value));
+        console.log(_time);
+        this.setState({
+            dateTime: _time
+        });
 
     },
 
@@ -383,20 +392,20 @@ const AtmosphericElectricHourPage = React.createClass({
             <Box width='100%' alignItems='center' style={{
                 height: 50
             }}>
-            <IconButton tooltip="-5分钟" touch={true}  value={-5} tooltipPosition='top-center' onClick={this.handleChangeTimeByMinute} >
+            <IconButton tooltip="-5分钟" tooltipPosition='top-center'  value={-5}  onClick={this.handleChangeTimeByMinute} >
             <NavigationArrowBack  />
             </IconButton>
-            <IconButton tooltip="-1分钟"  tooltipPosition='top-center'>
+            <IconButton tooltip="-1分钟"  tooltipPosition='top-center' value={-1}  onClick={this.handleChangeTimeByMinute}>
             <NavigationChevronLeft  />
             </IconButton>
             <Datetime dateFormat='YYYY-MM-DD' timeFormat='HH:mm' locale='zh_cn' value={this.state.dateTime} />
-            <IconButton tooltip="+1分钟" tooltipPosition='top-center'>
+            <IconButton tooltip="+1分钟" tooltipPosition='top-center' value={1}  onClick={this.handleChangeTimeByMinute}>
             <NavigationChevronRight />
             </IconButton>
-            <IconButton tooltip="+5分钟" touch={true} tooltipPosition='top-center'>
+            <IconButton tooltip="+5分钟"  tooltipPosition='top-center' value={5}  onClick={this.handleChangeTimeByMinute}>
             <NavigationArrowForward />
             </IconButton>
-            <IconButton tooltip="刷新" touch={true} tooltipPosition='top-center'>
+            <IconButton tooltip="刷新"  tooltipPosition='top-center'>
             <NavigationRefresh color={Colors.green500} />
             </IconButton>
            
