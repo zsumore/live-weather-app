@@ -50,6 +50,7 @@ const getLineChartWidth = (isClose) => {
 };
 
 const convertData = (data) => {
+
     let res = [];
     for (let i = 0; i < data.length; i++) {
 
@@ -106,38 +107,7 @@ const iconStyles = {
     marginTop: 8
 };
 
-const tableData = [
-    {
-        name: 'John Smith',
-        status: 'Employed',
-        selected: true,
-    },
-    {
-        name: 'Randal White',
-        status: 'Unemployed',
-    },
-    {
-        name: 'Stephanie Sanders',
-        status: 'Employed',
-        selected: true,
-    },
-    {
-        name: 'Steve Brown',
-        status: 'Employed',
-    },
-    {
-        name: 'Joyce Whitten',
-        status: 'Employed',
-    },
-    {
-        name: 'Samuel Roberts',
-        status: 'Employed',
-    },
-    {
-        name: 'Adam Moore',
-        status: 'Employed',
-    }
-];
+
 
 const AtmosphericElectricHourPage = React.createClass({
 
@@ -161,14 +131,37 @@ const AtmosphericElectricHourPage = React.createClass({
             lineChartOption: LineChartOption,
             lineChartWidth: getLineChartWidth(true),
             dateTime: getNowTime(),
-            auto: true
+            auto: true,
+            warnData: {
+                data: []
+            }
         };
     },
 
     mixins: [StylePropable, StyleResizable],
 
 
-    handleChangeMapChartOption(option) {
+    handleChangeWarnData(param) {
+        const _page = this;
+        const _state = this.state;
+        const scatterChart = this.state.scatterChart;
+        const scatterChartOption = this.state.scatterChartOption;
+
+        request.get('data/ae-5m-warn.json').end((err, res) => {
+
+
+            let _warnData = JSON.parse(res.text);
+            _page.setState({
+                warnData: _warnData
+            });
+
+            scatterChartOption.series[0].data = getNormalData(convertData(_warnData.data));
+            scatterChartOption.series[1].data = getWarnData(convertData(_warnData.data));
+            scatterChart.setOption(scatterChartOption);
+        });
+
+    },
+    handleChangeScatterChartOption(option) {
 
         scatterChart.setOption(option);
 
@@ -214,6 +207,9 @@ const AtmosphericElectricHourPage = React.createClass({
         const scatterChart = this.state.scatterChart = echarts.init(document.getElementById('AtmosphericElectricHourPage.scatterChart'));
         const scatterChartOption = this.state.scatterChartOption;
         const _state = this.state;
+        const _page = this;
+
+
 
         scatterChart.on('click', function(param) {
 
@@ -227,123 +223,8 @@ const AtmosphericElectricHourPage = React.createClass({
         request.get('map/json/440600.json').end((err, res) => {
 
             echarts.registerMap('foshan', res.text);
-            scatterChartOption.series[0].data = getNormalData(convertData([
-                {
-                    sid: '59828',
-                    value: 30
-                },
-                {
-                    sid: 'AE2267',
-                    value: 20
-                },
-                {
-                    sid: 'AE2213',
-                    value: 30
-                },
-                {
-                    sid: 'AE6834',
-                    value: 32
-                }, {
-                    sid: 'AE2264',
-                    value: 0
-                },
-                {
-                    sid: 'AE2262',
-                    value: -1
-                },
-                {
-                    sid: 'AE2270',
-                    value: 18
-                }, {
-                    sid: 'AE2229',
-                    value: 9
-                },
-                {
-                    sid: 'AE6963',
-                    value: 22
-                },
-                {
-                    sid: 'AE6946',
-                    value: 20
-                }, {
-                    sid: 'AE2224',
-                    value: 10
-                },
-                {
-                    sid: 'AE6949',
-                    value: 12
-                },
-                {
-                    sid: 'AE7019',
-                    value: -999
-                }, {
-                    sid: 'AE7032',
-                    value: 9
-                },
-                {
-                    sid: 'AE7031',
-                    value: 25
-                }
-            ]));
-            scatterChartOption.series[1].data = getWarnData(convertData([
-                {
-                    sid: '59828',
-                    value: 30
-                },
-                {
-                    sid: 'AE2267',
-                    value: 20
-                },
-                {
-                    sid: 'AE2213',
-                    value: 30
-                },
-                {
-                    sid: 'AE6834',
-                    value: 32
-                }, {
-                    sid: 'AE2264',
-                    value: 0
-                },
-                {
-                    sid: 'AE2262',
-                    value: -1
-                },
-                {
-                    sid: 'AE2270',
-                    value: 18
-                }, {
-                    sid: 'AE2229',
-                    value: 9
-                },
-                {
-                    sid: 'AE6963',
-                    value: 22
-                },
-                {
-                    sid: 'AE6946',
-                    value: 20
-                }, {
-                    sid: 'AE2224',
-                    value: 10
-                },
-                {
-                    sid: 'AE6949',
-                    value: 12
-                },
-                {
-                    sid: 'AE7019',
-                    value: -999
-                }, {
-                    sid: 'AE7032',
-                    value: 9
-                },
-                {
-                    sid: 'AE7031',
-                    value: 25
-                }
-            ]));
-            scatterChart.setOption(scatterChartOption);
+
+            _page.handleChangeWarnData(_state.dateTime);
         });
 
         this.state.lineChart = echarts.init(document.getElementById('AtmosphericElectricHourPage.lineChart'));
@@ -352,6 +233,8 @@ const AtmosphericElectricHourPage = React.createClass({
     },
 
     render() {
+
+
         return (
             <div><h2 className='page-title'>大气电场时数据</h2>
             
@@ -364,7 +247,7 @@ const AtmosphericElectricHourPage = React.createClass({
                 width: '95%',
                 height: (this.state.scatterChartHeight + 50) * 0.6
             }}>
-       </Box>
+           </Box>
             <Box style={{
                 width: '95%',
                 height: (this.state.scatterChartHeight + 50) * 0.4,
@@ -387,20 +270,20 @@ const AtmosphericElectricHourPage = React.createClass({
             </TableRow>
             <TableRow>
               <TableHeaderColumn tooltip="站名">站名</TableHeaderColumn>
-              <TableHeaderColumn tooltip="The Name">Name</TableHeaderColumn>
-              <TableHeaderColumn tooltip="The Status">Status</TableHeaderColumn>
+              <TableHeaderColumn tooltip="预警值">预警值</TableHeaderColumn>
+              <TableHeaderColumn tooltip="最后更新时间">更新时间</TableHeaderColumn>
             </TableRow>
           </TableHeader>
           <TableBody
-            deselectOnClickaway={true}
+            deselectOnClickaway={false}
             showRowHover={true}
             stripedRows={true}
             >
-            {tableData.map((row, index) => (
+            {this.state.warnData.data.map((row, index) => (
             <TableRow key={index} selected={row.selected}>
-                <TableRowColumn>{index}</TableRowColumn>
-                <TableRowColumn>{row.name}</TableRowColumn>
-                <TableRowColumn>{row.status}</TableRowColumn>
+                <TableRowColumn>{AEStationNameMap[row.sid]}</TableRowColumn>
+                <TableRowColumn>{row.value}</TableRowColumn>
+                <TableRowColumn>{row.last_time}</TableRowColumn>
               </TableRow>
             ))}
             </TableBody>
