@@ -11,6 +11,7 @@ import TableRowColumn from 'material-ui/lib/table/table-row-column';
 import TableBody from 'material-ui/lib/table/table-body';
 import Colors from 'material-ui/lib/styles/colors';
 
+import Checkbox from 'material-ui/lib/checkbox';
 import Toolbar from 'material-ui/lib/toolbar/toolbar';
 import ToolbarGroup from 'material-ui/lib/toolbar/toolbar-group';
 import ToolbarSeparator from 'material-ui/lib/toolbar/toolbar-separator';
@@ -34,7 +35,12 @@ import { AEStationCoordMap, AEStationNameMap } from './ae-station-option';
 
 
 const getScatterChartHeight = () => {
-    return window.innerHeight - 250;
+    let _height = window.innerHeight - 250;
+    if (_height >= 510) {
+        return _height;
+    } else {
+        return 510;
+    }
 };
 
 const getLineChartWidth = (isClose) => {
@@ -154,7 +160,8 @@ const AtmosphericElectricHourPage = React.createClass({
             lineChart: {},
             lineChartOption: LineChartOption,
             lineChartWidth: getLineChartWidth(true),
-            dateTime: getNowTime()
+            dateTime: getNowTime(),
+            auto: true
         };
     },
 
@@ -169,13 +176,22 @@ const AtmosphericElectricHourPage = React.createClass({
 
     handleChangeTimeByMinute(event) {
 
-        console.log('调整时间:' + event.target.value);
+
         let _time = new Date();
         _time.setTime(this.state.dateTime.getTime());
-        console.log(_time);
-        console.log(_time.getMinutes() + parseInt(event.target.value));
+
         _time.setMinutes(_time.getMinutes() + parseInt(event.target.value));
-        console.log(_time);
+
+        this.setState({
+            dateTime: _time
+        });
+
+    },
+
+    handleRefreshTime() {
+
+        let _time = getNowTime();
+
         this.setState({
             dateTime: _time
         });
@@ -197,10 +213,16 @@ const AtmosphericElectricHourPage = React.createClass({
     componentDidMount() {
         const scatterChart = this.state.scatterChart = echarts.init(document.getElementById('AtmosphericElectricHourPage.scatterChart'));
         const scatterChartOption = this.state.scatterChartOption;
+        const _state = this.state;
 
         scatterChart.on('click', function(param) {
-            let selected = param;
-            console.log(selected);
+
+            let _name = AEStationNameMap[param.name];
+            if (_name) {
+                _state.lineChartOption.title.subtext = _name;
+                _state.lineChart.setOption(_state.lineChartOption);
+            }
+
         });
         request.get('map/json/440600.json').end((err, res) => {
 
@@ -389,7 +411,8 @@ const AtmosphericElectricHourPage = React.createClass({
                 width: this.state.scatterChartHeight,
                 height: this.state.scatterChartHeight + 50
             }} column>
-            <Box width='100%' alignItems='center' style={{
+            <Box width='100%' justifyContent='space-between'>
+            <Box alignItems='center' style={{
                 height: 50
             }}>
             <IconButton tooltip="-5分钟" tooltipPosition='top-center'  value={-5}  onClick={this.handleChangeTimeByMinute} >
@@ -405,11 +428,21 @@ const AtmosphericElectricHourPage = React.createClass({
             <IconButton tooltip="+5分钟"  tooltipPosition='top-center' value={5}  onClick={this.handleChangeTimeByMinute}>
             <NavigationArrowForward />
             </IconButton>
-            <IconButton tooltip="刷新"  tooltipPosition='top-center'>
+            <IconButton tooltip="刷新"  tooltipPosition='top-center'  onClick={this.handleRefreshTime}>
             <NavigationRefresh color={Colors.green500} />
             </IconButton>
-           
             </Box>
+            <Box alignItems='center' style={{
+                height: 50,
+                width: 120
+            }}>
+            <Checkbox
+            label="自动更新"
+            defaultChecked={this.state.auto}
+            />
+            </Box>
+            </Box>
+
             <Box id='AtmosphericElectricHourPage.scatterChart'   style={{
                 width: this.state.scatterChartHeight,
                 height: this.state.scatterChartHeight

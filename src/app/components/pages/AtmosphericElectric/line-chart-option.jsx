@@ -4,7 +4,7 @@ import { AEStationCoordMap, AEStationNameMap } from './ae-station-option';
 
 const LineChartOption = {
     title: {
-        text: '大气电场折线图',
+        text: '大气电场值折线图',
         subtext: '佛山气象局（季华）',
         x: 'center',
         align: 'right'
@@ -34,9 +34,9 @@ const LineChartOption = {
     },
     tooltip: {
         trigger: 'axis',
-        formatter: function(params) {
+        formatter: (params) => {
             return params[0].name + '<br/>'
-                + params[0].seriesName + ' : ' + params[0].value + ' (次)';
+                + params[0].seriesName + ' : ' + params[0].value + ' (KV/m)';
 
         },
         axisPointer: {
@@ -44,7 +44,7 @@ const LineChartOption = {
         }
     },
     legend: {
-        data: ['预警值'],
+        data: ['电场值'],
 
         top: 'top',
         left: 'left'
@@ -131,14 +131,14 @@ const LineChartOption = {
     ],
     yAxis: [
         {
-            name: '预警值(次)',
+            name: '电场值(KV/m)',
             type: 'value',
             max: 500
         }
     ],
     series: [
         {
-            name: '预警值',
+            name: '电场值',
             type: 'line',
             hoverAnimation: false,
 
