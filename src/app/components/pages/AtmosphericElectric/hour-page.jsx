@@ -28,6 +28,7 @@ import { Box } from 'react-layout-components/lib';
 
 import Datetime from 'react-datetime';
 import zh_cn from 'moment/locale/zh-cn';
+import TimerMixin from 'react-timer-mixin';
 
 import ScatterChartOption from './scatter-chart-option';
 import LineChartOption from './line-chart-option';
@@ -134,11 +135,12 @@ const AtmosphericElectricHourPage = React.createClass({
             auto: true,
             warnData: {
                 data: []
-            }
+            },
+            timer: null
         };
     },
 
-    mixins: [StylePropable, StyleResizable],
+    mixins: [StylePropable, StyleResizable, TimerMixin],
 
 
     handleChangeWarnData(param) {
@@ -188,7 +190,22 @@ const AtmosphericElectricHourPage = React.createClass({
         this.setState({
             dateTime: _time
         });
+        console.log('refreshtime:' + _time);
 
+    },
+
+    handleCheckBoxChange(e, isInputChecked) {
+        if (isInputChecked) {
+            if (this.state.timer) {
+                this.clearInterval(this.state.timer);
+            }
+
+            this.state.timer = this.setInterval(this.handleRefreshTime, 60000);
+        } else {
+            if (this.state.timer) {
+                this.clearInterval(this.state.timer);
+            }
+        }
     },
 
     componentWillReceiveProps(nextProps, nextContext) {
@@ -209,7 +226,7 @@ const AtmosphericElectricHourPage = React.createClass({
         const _state = this.state;
         const _page = this;
 
-
+        this.state.timer = this.setInterval(this.handleRefreshTime, 60000);
 
         scatterChart.on('click', function(param) {
 
@@ -217,6 +234,7 @@ const AtmosphericElectricHourPage = React.createClass({
             if (_name) {
                 _state.lineChartOption.title.subtext = _name;
                 _state.lineChart.setOption(_state.lineChartOption);
+
             }
 
         });
@@ -229,6 +247,8 @@ const AtmosphericElectricHourPage = React.createClass({
 
         this.state.lineChart = echarts.init(document.getElementById('AtmosphericElectricHourPage.lineChart'));
         this.state.lineChart.setOption(this.state.lineChartOption);
+
+
 
     },
 
@@ -322,6 +342,7 @@ const AtmosphericElectricHourPage = React.createClass({
             <Checkbox
             label="自动更新"
             defaultChecked={this.state.auto}
+            onCheck={this.handleCheckBoxChange}
             />
             </Box>
             </Box>
