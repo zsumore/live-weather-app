@@ -85,6 +85,26 @@ const getWarnData = (data) => {
     return res;
 };
 
+const getAELineChartxAxisData = (data) => {
+    let res = [];
+    for (let i = 0; i < data.length; i++) {
+        if (data[i].dt) {
+            res.push(data[i].dt);
+        }
+    }
+    return res;
+};
+
+const getAELineChartData = (data) => {
+    let res = [];
+    for (let i = 0; i < data.length; i++) {
+        if (data[i].value) {
+            res.push(data[i].value);
+        }
+    }
+    return res;
+};
+
 
 const getNormalData = (data) => {
     let res = [];
@@ -136,7 +156,8 @@ const AtmosphericElectricHourPage = React.createClass({
             warnData: {
                 data: []
             },
-            timer: null
+            timer: null,
+            selectedStation: '59288'
         };
     },
 
@@ -169,6 +190,26 @@ const AtmosphericElectricHourPage = React.createClass({
 
     },
 
+    handleChangeLineChartOption(option) {
+        if (option) {
+            this.state.lineChart.setOption(option);
+        } else {
+
+            request.get('data/ae-10m-value.json').end((err, res) => {
+
+
+                let _valueData = JSON.parse(res.text);
+
+                this.state.lineChartOption.xAxis.data = getAELineChartxAxisData(_valueData.data);
+
+                this.state.lineChartOption.series[0].data = getAELineChartData(_valueData.data);
+
+                this.state.lineChart.setOption(this.state.lineChartOption);
+            });
+        }
+
+    },
+
     handleChangeTimeByMinute(event) {
 
 
@@ -191,6 +232,26 @@ const AtmosphericElectricHourPage = React.createClass({
             dateTime: _time
         });
         console.log('refreshtime:' + _time);
+
+    },
+    handleChangeDatetime(value) {
+        console.log(event);
+
+    },
+    handleChangeStation(sid) {
+
+        if (this.state.selectedStation !== sid) {
+
+            let _name = AEStationNameMap[sid];
+            if (_name) {
+                this.state.lineChartOption.title.subtext = _name;
+                this.state.lineChart.setOption(this.state.lineChartOption);
+
+                this.setState({
+                    selectedStation: sid
+                });
+            }
+        }
 
     },
 
@@ -229,13 +290,7 @@ const AtmosphericElectricHourPage = React.createClass({
         this.state.timer = this.setInterval(this.handleRefreshTime, 60000);
 
         scatterChart.on('click', function(param) {
-
-            let _name = AEStationNameMap[param.name];
-            if (_name) {
-                _state.lineChartOption.title.subtext = _name;
-                _state.lineChart.setOption(_state.lineChartOption);
-
-            }
+            _page.handleChangeStation(param.name);
 
         });
         request.get('map/json/440600.json').end((err, res) => {
@@ -246,9 +301,7 @@ const AtmosphericElectricHourPage = React.createClass({
         });
 
         this.state.lineChart = echarts.init(document.getElementById('AtmosphericElectricHourPage.lineChart'));
-        this.state.lineChart.setOption(this.state.lineChartOption);
-
-
+        this.handleChangeLineChartOption();
 
     },
 

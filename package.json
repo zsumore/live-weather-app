@@ -69,6 +69,7 @@
     "react-layout-components": "^2.1.2",
     "react-router": "^1.0.0",
     "react-tap-event-plugin": "^0.2.0",
+    "react-timer-mixin": "^0.13.3",
     "superagent": "^1.7.2"
   }
 }
