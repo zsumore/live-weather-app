@@ -9,7 +9,7 @@ function getMapChartHeight() {
 
 }
 
-const AtmosphericElectricDatePage = React.createClass({
+const AtmosphericElectricMonthPage = React.createClass({
 
     propTypes: {
         onChangeMuiTheme: React.PropTypes.func,
@@ -41,7 +41,7 @@ const AtmosphericElectricDatePage = React.createClass({
 
     render() {
         return (
-            <div><h2 className='page-title'>大气电场日数据</h2>
+            <div><h2 className='page-title'>大气电场月数据</h2>
             <div>hello</div>
             <div id='AtmosphericElectricHourPage.mapChart' style={{
                 width: this.state.mapChartWidth,
@@ -53,4 +53,4 @@ const AtmosphericElectricDatePage = React.createClass({
     }
 });
 
-export default AtmosphericElectricDatePage;
+export default AtmosphericElectricMonthPage;

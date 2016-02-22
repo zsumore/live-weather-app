@@ -31,7 +31,9 @@ const AppLeftNav = React.createClass({
     },
     handleTouchTapHeader() {
         this.props.history.push('/');
-        this.setState({ leftNavOpen: true });
+        this.setState({
+            leftNavOpen: true
+        });
     },
     getStyles() {
         return {
@@ -48,37 +50,39 @@ const AppLeftNav = React.createClass({
         };
     },
     render() {
-        const { location, docked, onRequestChangeLeftNav, onRequestChangeList, open, style } = this.props;
+        const {location, docked, onRequestChangeLeftNav, onRequestChangeList, open, style} = this.props;
 
         const styles = this.getStyles();
 
         return (
             <LeftNav
-             style={ style }
-             docked={ docked }
-             open={ open }
-             onRequestChange={ onRequestChangeLeftNav }>
+            style={ style }
+            docked={ docked }
+            open={ open }
+            onRequestChange={ onRequestChangeLeftNav }>
       <div
-           style={ this.prepareStyles(styles.logo) }
-           onTouchTap={ this.handleTouchTapHeader }>
+            style={ this.prepareStyles(styles.logo)}
+            onTouchTap={ this.handleTouchTapHeader }>
         Material-UI
       </div>
       <SelectableList valueLink={ {
                 value: location.pathname,
                 requestChange: onRequestChangeList
-            } }>
+            }}>
         <ListItem
-                  leftAvatar={ <Avatar src="images/ae-128.png" /> }
-                  primaryText="大气电场"
-                  primaryTogglesNestedList={ true }
-                  nestedItems={ [
-                <ListItem leftAvatar={ <Avatar  backgroundColor={ Colors.cyan600 }>H</Avatar> } primaryText="时数据" value="/atmospheric-electric/hour" />,
-                <ListItem leftAvatar={ <Avatar  backgroundColor={ Colors.cyan800 }>D</Avatar> } primaryText="日数据" value="/atmospheric-electric/date" />
-            ] } />
+            leftAvatar={ <Avatar src="images/ae-128.png" /> }
+            primaryText="大气电场"
+            primaryTogglesNestedList={ true }
+            nestedItems={[
+                <ListItem leftAvatar={ <Avatar  backgroundColor={ Colors.cyan600 }>N</Avatar> } primaryText="十分钟" value="/atmospheric-electric/now" />,
+                <ListItem leftAvatar={ <Avatar  backgroundColor={ Colors.cyan800 }>D</Avatar> } primaryText="时数据" value="/atmospheric-electric/hour" />,
+                <ListItem leftAvatar={ <Avatar  backgroundColor={ Colors.cyan600 }>H</Avatar> } primaryText="日数据" value="/atmospheric-electric/date" />,
+                <ListItem leftAvatar={ <Avatar  backgroundColor={ Colors.cyan800 }>M</Avatar> } primaryText="月数据" value="/atmospheric-electric/month" />
+            ]} />
       </SelectableList>
       <Divider />
     </LeftNav>
-        );
+            );
     }
 });
 

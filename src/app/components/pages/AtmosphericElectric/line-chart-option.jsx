@@ -35,7 +35,8 @@ const LineChartOption = {
     tooltip: {
         trigger: 'axis',
         formatter: (params) => {
-            return params[0].name + '<br/>'
+            // console.log(params);
+            return params[0].name + '<br />'
                 + params[0].seriesName + ' : ' + params[0].value + ' (KV/m)';
 
         },
@@ -53,20 +54,21 @@ const LineChartOption = {
         {
             show: true,
             realtime: true,
-            start: 60,
-            end: 80
+            start: 50,
+            end: 100
         },
         {
             type: 'inside',
             realtime: true,
-            start: 60,
-            end: 80
+            start: 50,
+            end: 100
         }
     ],
     xAxis: [
         {
-            type: 'category',
-            boundaryGap: false,
+
+            name: '时间',
+
             axisLine: {
                 onZero: false
             },

@@ -5,6 +5,8 @@ import { Route, Redirect, IndexRoute } from 'react-router';
 import Master from './components/master';
 import AtmosphericElectricHourPage from './components/pages/AtmosphericElectric/hour-page';
 import AtmosphericElectricDatePage from './components/pages/AtmosphericElectric/date-page';
+import AtmosphericElectricNowPage from './components/pages/AtmosphericElectric/now-page';
+import AtmosphericElectricMonthPage from './components/pages/AtmosphericElectric/month-page';
 
 
 /**
@@ -18,13 +20,15 @@ import AtmosphericElectricDatePage from './components/pages/AtmosphericElectric/
  */
 const AppRoutes = (
 <Route path = "/" component = {Master} >
-<IndexRoute component={AtmosphericElectricHourPage} />
+
     { /* Show the dashboard at / */ }
-    <IndexRoute component={AtmosphericElectricHourPage} />
-    <Redirect from="atmospheric-electric" to="/atmospheric-electric/hour" />
+    <IndexRoute component={AtmosphericElectricNowPage} />
+    <Redirect from="atmospheric-electric" to="/atmospheric-electric/now" />
     <Route path = "atmospheric-electric" >
+    <Route path="now" component={AtmosphericElectricNowPage} />
     <Route path="hour" component={AtmosphericElectricHourPage} />
-    <Route path = "date" component = {AtmosphericElectricDatePage}/>
+    <Route path="date" component = {AtmosphericElectricDatePage}/>
+    <Route path="month" component = {AtmosphericElectricMonthPage}/>
     </Route> 
     <Redirect from = "*" to = "/atmospheric-electric/hour" />
     </Route>

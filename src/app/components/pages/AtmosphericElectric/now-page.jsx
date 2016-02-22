@@ -131,7 +131,7 @@ const iconStyles = {
 
 
 
-const AtmosphericElectricHourPage = React.createClass({
+const AtmosphericElectricNowPage = React.createClass({
 
     propTypes: {
         onChangeMuiTheme: React.PropTypes.func,
@@ -308,7 +308,7 @@ const AtmosphericElectricHourPage = React.createClass({
 
 
         return (
-            <div><h2 className='page-title'>大气电场时数据</h2>
+            <div><h2 className='page-title'>大气电场即时数据</h2>
             
             <Box width='100%'  justifyContent='space-around' alignItems='flex-start'  column={false} reverse={false}>
             <Box  flex={1} style={{
@@ -411,4 +411,4 @@ const AtmosphericElectricHourPage = React.createClass({
     }
 });
 
-export default AtmosphericElectricHourPage;
+export default AtmosphericElectricNowPage;
