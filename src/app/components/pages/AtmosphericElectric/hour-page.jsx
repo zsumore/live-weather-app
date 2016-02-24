@@ -30,12 +30,12 @@ import Datetime from 'react-datetime';
 import zh_cn from 'moment/locale/zh-cn';
 import TimerMixin from 'react-timer-mixin';
 
-import ScatterChartOption from './scatter-chart-option';
-import LineChartOption from './line-chart-option';
+import HourMapChartOption from './hour-map-chart-option';
+import HourLineChartOption from './hour-line-chart-option';
 import { AEStationCoordMap, AEStationNameMap } from './ae-station-option';
 
 
-const getScatterChartHeight = () => {
+const getMapChartHeight = () => {
     let _height = window.innerHeight - 250;
     if (_height >= 510) {
         return _height;
@@ -46,8 +46,8 @@ const getScatterChartHeight = () => {
 
 const getLineChartWidth = (isClose) => {
     if (isClose)
-        return window.innerWidth - getScatterChartHeight();
-    return window.innerWidth - 280 - getScatterChartHeight();
+        return window.innerWidth - getMapChartHeight();
+    return window.innerWidth - 280 - getMapChartHeight();
 };
 
 const convertData = (data) => {
@@ -75,7 +75,7 @@ const convertData = (data) => {
 };
 
 
-const getWarnData = (data) => {
+const getMapChartData = (data) => {
     let res = [];
     for (let i = 0; i < data.length; i++) {
         if (data[i].value[2] > 20) {
@@ -92,16 +92,16 @@ const getAELineChartxAxisData = (data) => {
             res.push(data[i].dt);
         }
     }
-    console.log(res);
+    //console.log(res);
     return res;
 };
 
 const getAELineChartData = (data) => {
     let res = [];
     for (let i = 0; i < data.length; i++) {
-        if (data[i].value) {
-            res.push(data[i].value);
-        }
+
+        res.push(data[i].value);
+
     }
     return res;
 };
@@ -119,6 +119,7 @@ const getNormalData = (data) => {
 
 const getNowTime = () => {
     let _date = new Date();
+    _date.setMinutes(0);
     _date.setSeconds(0);
     _date.setMilliseconds(0);
     return _date;
@@ -145,10 +146,12 @@ const AtmosphericElectricHourPage = React.createClass({
 
     getInitialState() {
         return {
+            mapChartHeight: getMapChartHeight(),
             leftNavClose: true,
-            scatterChart: {},
-            scatterChartHeight: getScatterChartHeight(),
+            mapChart: {},
+            mapChartOption: HourMapChartOption,
             lineChart: {},
+            lineChartOption: HourLineChartOption,
             lineChartWidth: getLineChartWidth(true),
             dateTime: getNowTime(),
             auto: true,
@@ -163,11 +166,9 @@ const AtmosphericElectricHourPage = React.createClass({
     mixins: [StylePropable, StyleResizable, TimerMixin],
 
 
-    handleChangeWarnData(param) {
+    handleChangeMapChartData(param) {
         const _page = this;
         const _state = this.state;
-        const scatterChart = this.state.scatterChart;
-
 
         request.get('data/ae-5m-warn.json').end((err, res) => {
 
@@ -177,15 +178,15 @@ const AtmosphericElectricHourPage = React.createClass({
                 warnData: _warnData
             });
 
-            ScatterChartOption.series[0].data = getNormalData(convertData(_warnData.data));
-            ScatterChartOption.series[1].data = getWarnData(convertData(_warnData.data));
-            scatterChart.setOption(ScatterChartOption);
+            _state.mapChartOption.series[0].data = convertData(_warnData.data);
+            _state.mapChartOption.series[1].data = convertData(_warnData.data);
+            _state.mapChart.setOption(_state.mapChartOption);
         });
 
     },
-    handleChangeScatterChartOption(option) {
+    handleChangeMapChartOption(option) {
 
-        scatterChart.setOption(option);
+        mapChart.setOption(option);
 
     },
 
@@ -196,10 +197,10 @@ const AtmosphericElectricHourPage = React.createClass({
             _state.lineChart.setOption(option);
         } else {
 
-            request.get('data/ae-10m-value.json').end((err, res) => {
+            request.get('data/ae-hour-data.json').end((err, res) => {
 
                 let _valueData = JSON.parse(res.text);
-                let _lineChartOption = LineChartOption
+                let _lineChartOption = _state.lineChartOption
                 _lineChartOption.xAxis[0].data = getAELineChartxAxisData(_valueData.data).map((str) => {
                     return str.replace(' ', '\n')
                 });
@@ -282,13 +283,13 @@ const AtmosphericElectricHourPage = React.createClass({
 
 
     componentDidMount() {
-        const scatterChart = this.state.scatterChart = echarts.init(document.getElementById('AtmosphericElectricHourPage.scatterChart'));
+        const mapChart = this.state.mapChart = echarts.init(document.getElementById('AtmosphericElectricHourPage.mapChart'));
         const _state = this.state;
         const _page = this;
 
         this.state.timer = this.setInterval(this.handleRefreshTime, 60000);
 
-        scatterChart.on('click', function(param) {
+        mapChart.on('click', function(param) {
             _page.handleChangeStation(param.name);
 
         });
@@ -296,10 +297,11 @@ const AtmosphericElectricHourPage = React.createClass({
 
             echarts.registerMap('foshan', res.text);
 
-            _page.handleChangeWarnData(_state.dateTime);
+            _page.handleChangeMapChartData(_state.dateTime);
         });
 
         this.state.lineChart = echarts.init(document.getElementById('AtmosphericElectricHourPage.lineChart'));
+
         this.handleChangeLineChartOption();
 
     },
@@ -313,16 +315,16 @@ const AtmosphericElectricHourPage = React.createClass({
             <Box width='100%'  justifyContent='space-around' alignItems='flex-start'  column={false} reverse={false}>
             <Box  flex={1} style={{
                 width: this.state.lineChartWidth,
-                height: this.state.scatterChartHeight + 50
+                height: this.state.mapChartHeight + 50
             }} column>
              <Box id='AtmosphericElectricHourPage.lineChart'  style={{
                 width: '95%',
-                height: (this.state.scatterChartHeight + 50) * 0.6
+                height: (this.state.mapChartHeight + 50) * 0.4
             }}>
            </Box>
             <Box style={{
                 width: '95%',
-                height: (this.state.scatterChartHeight + 50) * 0.4,
+                height: (this.state.mapChartHeight + 50) * 0.6,
                 marginRight: 50
             }}>
           <Table
@@ -363,24 +365,24 @@ const AtmosphericElectricHourPage = React.createClass({
             </Box>
             </Box>
             <Box style={{
-                width: this.state.scatterChartHeight,
-                height: this.state.scatterChartHeight + 50
+                width: this.state.mapChartHeight,
+                height: this.state.mapChartHeight + 50
             }} column>
             <Box width='100%' justifyContent='space-between'>
             <Box alignItems='center' style={{
                 height: 50
             }}>
-            <IconButton tooltip="-5分钟" tooltipPosition='top-center'  value={-5}  onClick={this.handleChangeTimeByMinute} >
+            <IconButton tooltip="-1天" tooltipPosition='top-center'  value={-5}  onClick={this.handleChangeTimeByMinute} >
             <NavigationArrowBack  />
             </IconButton>
-            <IconButton tooltip="-1分钟"  tooltipPosition='top-center' value={-1}  onClick={this.handleChangeTimeByMinute}>
+            <IconButton tooltip="-1小时"  tooltipPosition='top-center' value={-1}  onClick={this.handleChangeTimeByMinute}>
             <NavigationChevronLeft  />
             </IconButton>
-            <Datetime dateFormat='YYYY-MM-DD' timeFormat='HH:mm' locale='zh_cn' value={this.state.dateTime} />
-            <IconButton tooltip="+1分钟" tooltipPosition='top-center' value={1}  onClick={this.handleChangeTimeByMinute}>
+            <Datetime dateFormat='YYYY-MM-DD' timeFormat='HH' locale='zh_cn' value={this.state.dateTime} />
+            <IconButton tooltip="+1小时" tooltipPosition='top-center' value={1}  onClick={this.handleChangeTimeByMinute}>
             <NavigationChevronRight />
             </IconButton>
-            <IconButton tooltip="+5分钟"  tooltipPosition='top-center' value={5}  onClick={this.handleChangeTimeByMinute}>
+            <IconButton tooltip="+1天"  tooltipPosition='top-center' value={5}  onClick={this.handleChangeTimeByMinute}>
             <NavigationArrowForward />
             </IconButton>
             <IconButton tooltip="刷新"  tooltipPosition='top-center'  onClick={this.handleRefreshTime}>
@@ -399,9 +401,9 @@ const AtmosphericElectricHourPage = React.createClass({
             </Box>
             </Box>
 
-            <Box id='AtmosphericElectricHourPage.scatterChart'   style={{
-                width: this.state.scatterChartHeight,
-                height: this.state.scatterChartHeight
+            <Box id='AtmosphericElectricHourPage.mapChart'   style={{
+                width: this.state.mapChartHeight,
+                height: this.state.mapChartHeight
             }} />
             </Box>
             </Box>

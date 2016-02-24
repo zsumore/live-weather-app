@@ -2,10 +2,10 @@ import React from 'react';
 import echarts from 'echarts/echarts-line-map';
 import { AEStationCoordMap, AEStationNameMap } from './ae-station-option';
 
-const ScatterChartOption = {
+const HourMapChartOption = {
     backgroundColor: '#404a59',
     title: {
-        text: '佛山大气电场预警',
+        text: '佛山大气电场时数据',
         left: 'center',
         textStyle: {
             color: '#fff'
@@ -57,7 +57,7 @@ const ScatterChartOption = {
         top: 'bottom',
         left: 'right',
         data: [{
-            name: '橙色以上',
+            name: '热力图',
             // 强制设置图形为圆。
             icon: 'circle',
             textStyle: {
@@ -65,7 +65,7 @@ const ScatterChartOption = {
             }
         }
             , {
-                name: '黄色以下',
+                name: '散点图',
                 icon: 'circle',
                 // 设置文本为红色
                 textStyle: {
@@ -120,8 +120,8 @@ const ScatterChartOption = {
     },
     series: [
         {
-            name: '黄色以下',
-            type: 'scatter',
+            name: '热力图',
+            type: 'heatmap',
             coordinateSystem: 'geo',
             data: [],
             symbolSize: 10,
@@ -152,24 +152,19 @@ const ScatterChartOption = {
             color: ['#ffff00']
         },
         {
-            name: '橙色以上',
-            type: 'effectScatter',
+            name: '散点图',
+            type: 'scatter',
             coordinateSystem: 'geo',
             data: [],
             symbolSize: 10,
-            showEffectOn: 'render',
-            rippleEffect: {
-                brushType: 'stroke'
-            },
-            hoverAnimation: true,
             label: {
                 normal: {
-                    formatter: '{b}',
+                    formatter: '{c}',
                     position: 'right',
                     show: true,
                     formatter: (params, ticket, callback) => {
 
-                        return AEStationNameMap[params.name];
+                        return params[2];
                     }
                 }
             },
@@ -186,4 +181,4 @@ const ScatterChartOption = {
     ]
 };
 
-export default ScatterChartOption;
+export default HourMapChartOption;
