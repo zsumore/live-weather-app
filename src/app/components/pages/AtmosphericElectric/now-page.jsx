@@ -1,5 +1,7 @@
 import React from 'react';
+import jQuery from 'jquery';
 import echarts from 'echarts/echarts-line-map';
+
 
 import { ClearFix } from 'material-ui';
 import { StylePropable, StyleResizable } from 'material-ui/lib/mixins';
@@ -26,13 +28,14 @@ import IconButton from 'material-ui/lib/icon-button';
 import request from 'superagent/lib/client';
 import { Box } from 'react-layout-components/lib';
 
-import Datetime from 'react-datetime';
-import zh_cn from 'moment/locale/zh-cn';
+import DateTimeField from 'react-bootstrap-datetimepicker';
+import moment from 'moment';
 import TimerMixin from 'react-timer-mixin';
 
 import NowMapChartOption from './now-map-chart-option';
 import LineChartOption from './line-chart-option';
-import { AEStationCoordMap, AEStationNameMap } from './ae-station-option';
+import { AEStationSet, AEStationCoordMap, AEStationNameMap } from './ae-station-option';
+
 
 
 const getMapChartHeight = () => {
@@ -74,6 +77,30 @@ const convertData = (data) => {
     return res;
 };
 
+const convertWarnData = (data) => {
+
+    let res = [];
+    for (let i = 0; i < data.length; i++) {
+
+        let geoCoord = AEStationCoordMap[data[i].stationid];
+
+        if (geoCoord) {
+
+            let geoStaion = AEStationNameMap[data[i].stationid];
+            if (geoStaion) {
+                // let _concatValue=geoCoord.concat(data[i].value);
+
+                res.push({
+                    name: data[i].stationid,
+                    value: geoCoord.concat(data[i].value)
+                });
+            }
+        }
+    }
+
+    return res;
+};
+
 
 const getMapChartData = (data) => {
     let res = [];
@@ -92,16 +119,16 @@ const getAELineChartxAxisData = (data) => {
         res.push(data[i].dt);
 
     }
-    //console.log(res);
+
     return res;
 };
 
 const getAELineChartData = (data) => {
     let res = [];
     for (let i = 0; i < data.length; i++) {
-        if (data[i].value) {
-            res.push(data[i].value);
-        }
+
+        res.push(data[i].intensity);
+
     }
     return res;
 };
@@ -118,10 +145,8 @@ const getNormalData = (data) => {
 };
 
 const getNowTime = () => {
-    let _date = new Date();
-    _date.setSeconds(0);
-    _date.setMilliseconds(0);
-    return _date;
+
+    return moment().seconds(0).milliseconds(0);
 };
 
 
@@ -152,7 +177,9 @@ const AtmosphericElectricNowPage = React.createClass({
             mapChartOption: NowMapChartOption,
             mapChartHeight: getMapChartHeight(),
             lineChart: {},
+            lineChartOption: LineChartOption,
             lineChartWidth: getLineChartWidth(true),
+
             dateTime: getNowTime(),
             auto: true,
             warnData: {
@@ -166,24 +193,74 @@ const AtmosphericElectricNowPage = React.createClass({
 
 
 
-    handleChangeMapChartData(param) {
+    handleChangeMapChartData() {
 
         const _page = this;
+        _page.state.mapChart.showLoading();
 
+        jQuery.ajax({
+            url: 'http://10.151.78.189:8080/meteoplant/servlet/MapServlet',
+            type: 'post',
+            data: {
 
-        request.get('data/ae-5m-warn.json').end((err, res) => {
+                'start': _page.state.dateTime.format('YYYY-MM-DD HH:mm:ss')
+            },
+            success: (res) => {
+                _page.state.mapChart.hideLoading();
 
+                let _warnData = JSON.parse(res);
 
-            let _warnData = JSON.parse(res.text);
-            _page.setState({
-                warnData: _warnData
-            });
+                let _tempset = new Set();
+                for (let i = 0; i < _warnData.data.length; i++) {
+                    _tempset.add(_warnData.data[i].stationid);
+                }
 
-            _page.state.mapChartOption.series[0].data = getNormalData(convertData(_warnData.data));
-            _page.state.mapChartOption.series[1].data = getMapChartData(convertData(_warnData.data));
-            _page.state.mapChart.setOption(_page.state.mapChartOption);
+                for ( let x of AEStationSet ) {
+
+                    if (_tempset.has(x)) {
+
+                    } else {
+                        let _tempdata = {
+                            'last_time': '没数据',
+                            'value': -999,
+                            'stationid': x
+                        };
+                        _warnData.data.push(_tempdata);
+                    }
+                }
+
+                _warnData.data.sort((o1, o2) => {
+                    return o2.value - o1.value;
+                });
+
+                _page.setState({
+                    warnData: _warnData
+                });
+
+                _page.state.mapChartOption.series[0].data = getNormalData(convertWarnData(_warnData.data));
+                _page.state.mapChartOption.series[1].data = getMapChartData(convertWarnData(_warnData.data));
+                _page.state.mapChart.setOption(_page.state.mapChartOption);
+            },
+            error: (res) => {
+                _page.state.mapChart.hideLoading();
+                console.log(res);
+            }
         });
 
+    /*
+            request.get('data/ae-5m-warn.json').end((err, res) => {
+
+
+                let _warnData = JSON.parse(res.text);
+                _page.setState({
+                    warnData: _warnData
+                });
+
+                _page.state.mapChartOption.series[0].data = getNormalData(convertData(_warnData.data));
+                _page.state.mapChartOption.series[1].data = getMapChartData(convertData(_warnData.data));
+                _page.state.mapChart.setOption(_page.state.mapChartOption);
+            });
+    */
     },
     handleChangeMapChartOption(option) {
 
@@ -191,38 +268,64 @@ const AtmosphericElectricNowPage = React.createClass({
 
     },
 
-    handleChangeLineChartOption(option) {
+    handleChangeLineChartOption(stationid, datetime, option) {
 
         const _state = this.state;
         if (option) {
             _state.lineChart.setOption(option);
         } else {
 
-            request.get('data/ae-10m-value.json').end((err, res) => {
+            jQuery.ajax({
+                //
+                url: 'http://10.151.78.189:8080/meteoplant/servlet/MinuteMeteoServlet',
+                type: 'post',
+                data: {
+                    'stationid': stationid,
+                    'start': datetime.format('YYYY-MM-DD HH:mm:ss')
+                },
+                success: (res) => {
 
-                let _valueData = JSON.parse(res.text);
-                let _lineChartOption = LineChartOption
-                _lineChartOption.xAxis[0].data = getAELineChartxAxisData(_valueData.data).map((str) => {
-                    return str.replace(' ', '\n')
-                });
-                _lineChartOption.series[0].data = getAELineChartData(_valueData.data);
-                _state.lineChart.setOption(_lineChartOption);
+                    let _valueData = JSON.parse(res);
+
+                    let _lineChartOption = _state.lineChartOption;
+                    _lineChartOption.xAxis[0].data = getAELineChartxAxisData(_valueData.data).map((str) => {
+                        return str.replace(' ', '\n')
+                    });
+                    _lineChartOption.series[0].data = getAELineChartData(_valueData.data);
+                    _state.lineChart.setOption(_lineChartOption);
+                },
+                error: (res) => {
+                    console.log(res);
+                }
             });
+
         }
+
+    },
+
+    handleTableRowSelection(rowArray) {
+
+
+        this.handleChangeStation(this.state.warnData.data[rowArray[0]].stationid);
+    },
+    handleTableRowSelected(sid) {
+        return sid === this.state.selectedStation;
 
     },
 
     handleChangeTimeByMinute(event) {
 
 
-        let _time = new Date();
-        _time.setTime(this.state.dateTime.getTime());
+        let _time = moment(this.state.dateTime);
 
-        _time.setMinutes(_time.getMinutes() + parseInt(event.target.value));
+
+        _time.minutes(_time.minutes() + parseInt(event.target.value));
 
         this.setState({
             dateTime: _time
         });
+        //console.log('change');
+        this.handleChangeDatetime();
 
     },
 
@@ -233,11 +336,15 @@ const AtmosphericElectricNowPage = React.createClass({
         this.setState({
             dateTime: _time
         });
-        console.log('refreshtime:' + _time);
+
+        this.handleChangeDatetime();
 
     },
-    handleChangeDatetime(value) {
-        console.log(event);
+    handleChangeDatetime(event) {
+
+        this.handleChangeLineChartOption(this.state.selectedStation, this.state.dateTime);
+        this.handleChangeMapChartData();
+
 
     },
     handleChangeStation(sid) {
@@ -247,8 +354,8 @@ const AtmosphericElectricNowPage = React.createClass({
             let _name = AEStationNameMap[sid];
             if (_name) {
                 this.state.lineChartOption.title.subtext = _name;
-                this.state.lineChart.setOption(this.state.lineChartOption);
-
+                //this.state.lineChart.setOption(this.state.lineChartOption);
+                this.handleChangeLineChartOption(sid, this.state.dateTime);
                 this.setState({
                     selectedStation: sid
                 });
@@ -296,11 +403,11 @@ const AtmosphericElectricNowPage = React.createClass({
 
             echarts.registerMap('foshan', res.text);
 
-            _page.handleChangeMapChartData(_page.state.dateTime);
+            _page.handleChangeMapChartData();
         });
 
         _page.state.lineChart = echarts.init(document.getElementById('AtmosphericElectricHourPage.lineChart'));
-        _page.handleChangeLineChartOption();
+        _page.handleChangeLineChartOption('59828', _page.state.dateTime);
 
         _page.state.timer = _page.setInterval(_page.handleRefreshTime, 60000);
     },
@@ -319,7 +426,7 @@ const AtmosphericElectricNowPage = React.createClass({
              <Box id='AtmosphericElectricHourPage.lineChart'  style={{
                 width: '95%',
                 height: (this.state.mapChartHeight + 50) * 0.6
-            }}>
+            }} >
            </Box>
             <Box style={{
                 width: '95%',
@@ -331,14 +438,14 @@ const AtmosphericElectricNowPage = React.createClass({
             fixedHeader={false}
             selectable={true}
             multiSelectable={false}
-            onRowSelection={this._onRowSelection}
+            onRowSelection={this.handleTableRowSelection}
             >
           <TableHeader enableSelectAll={false}>
             <TableRow>
               <TableHeaderColumn colSpan="3" tooltip="Super Header" style={{
                 textAlign: 'center'
             }}>
-                Super Header
+                {this.state.dateTime.format('YYYY-MM-DD HH:mm:ss')}
               </TableHeaderColumn>
             </TableRow>
             <TableRow>
@@ -353,8 +460,8 @@ const AtmosphericElectricNowPage = React.createClass({
             stripedRows={true}
             >
             {this.state.warnData.data.map((row, index) => (
-            <TableRow key={index} selected={row.selected}>
-                <TableRowColumn>{AEStationNameMap[row.sid]}</TableRowColumn>
+            <TableRow key={row.stationid} selected={this.handleTableRowSelected(row.stationid)}>
+                <TableRowColumn>{AEStationNameMap[row.stationid]}</TableRowColumn>
                 <TableRowColumn>{row.value}</TableRowColumn>
                 <TableRowColumn>{row.last_time}</TableRowColumn>
               </TableRow>
@@ -377,7 +484,9 @@ const AtmosphericElectricNowPage = React.createClass({
             <IconButton tooltip="-5分钟"  tooltipPosition='top-center' value={-5}  onClick={this.handleChangeTimeByMinute}>
             <NavigationChevronLeft  />
             </IconButton>
-            <Datetime dateFormat='YYYY-MM-DD' timeFormat='HH:mm' locale='zh_cn' value={this.state.dateTime} />
+
+           
+            <DateTimeField />
             <IconButton tooltip="+5分钟" tooltipPosition='top-center' value={5}  onClick={this.handleChangeTimeByMinute}>
             <NavigationChevronRight />
             </IconButton>

@@ -26,12 +26,12 @@ import IconButton from 'material-ui/lib/icon-button';
 import request from 'superagent/lib/client';
 import { Box } from 'react-layout-components/lib';
 
-import Datetime from 'react-datetime';
-import zh_cn from 'moment/locale/zh-cn';
+import DateTimeField from 'react-bootstrap-datetimepicker';
 import TimerMixin from 'react-timer-mixin';
 
 import HourMapChartOption from './hour-map-chart-option';
 import HourLineChartOption from './hour-line-chart-option';
+import HourHeatChartOption from './hour-heat-chart-option'
 import { AEStationCoordMap, AEStationNameMap } from './ae-station-option';
 
 
@@ -152,10 +152,12 @@ const AtmosphericElectricHourPage = React.createClass({
             mapChartOption: HourMapChartOption,
             lineChart: {},
             lineChartOption: HourLineChartOption,
+            heatChart: {},
+            heatChartOption: HourHeatChartOption,
             lineChartWidth: getLineChartWidth(true),
             dateTime: getNowTime(),
             auto: true,
-            warnData: {
+            mapChartData: {
                 data: []
             },
             timer: null,
@@ -173,13 +175,13 @@ const AtmosphericElectricHourPage = React.createClass({
         request.get('data/ae-5m-warn.json').end((err, res) => {
 
 
-            let _warnData = JSON.parse(res.text);
+            let _mapChartData = JSON.parse(res.text);
             _page.setState({
-                warnData: _warnData
+                mapChartData: _mapChartData
             });
 
-            _state.mapChartOption.series[0].data = convertData(_warnData.data);
-            _state.mapChartOption.series[1].data = convertData(_warnData.data);
+            _state.mapChartOption.series[0].data = convertData(_mapChartData.data);
+            _state.mapChartOption.series[1].data = convertData(_mapChartData.data);
             _state.mapChart.setOption(_state.mapChartOption);
         });
 
@@ -197,6 +199,8 @@ const AtmosphericElectricHourPage = React.createClass({
             _state.lineChart.setOption(option);
         } else {
 
+
+
             request.get('data/ae-hour-data.json').end((err, res) => {
 
                 let _valueData = JSON.parse(res.text);
@@ -207,8 +211,18 @@ const AtmosphericElectricHourPage = React.createClass({
                 _lineChartOption.series[0].data = getAELineChartData(_valueData.data);
                 _state.lineChart.setOption(_lineChartOption);
             });
+
         }
 
+    },
+
+    handleChangeHeatChartOption(option) {
+        const _state = this.state;
+        if (option) {
+            _state.lineChart.setOption(option);
+        } else {
+
+        }
     },
 
     handleChangeTimeByMinute(event) {
@@ -283,11 +297,11 @@ const AtmosphericElectricHourPage = React.createClass({
 
 
     componentDidMount() {
-        const mapChart = this.state.mapChart = echarts.init(document.getElementById('AtmosphericElectricHourPage.mapChart'));
-        const _state = this.state;
         const _page = this;
 
-        this.state.timer = this.setInterval(this.handleRefreshTime, 60000);
+        const mapChart = _page.state.mapChart = echarts.init(document.getElementById('AtmosphericElectricHourPage.mapChart'));
+
+        _page.state.timer = _page.setInterval(_page.handleRefreshTime, 60000);
 
         mapChart.on('click', function(param) {
             _page.handleChangeStation(param.name);
@@ -297,12 +311,16 @@ const AtmosphericElectricHourPage = React.createClass({
 
             echarts.registerMap('foshan', res.text);
 
-            _page.handleChangeMapChartData(_state.dateTime);
+            _page.handleChangeMapChartData(_page.state.dateTime);
         });
 
-        this.state.lineChart = echarts.init(document.getElementById('AtmosphericElectricHourPage.lineChart'));
+        _page.state.lineChart = echarts.init(document.getElementById('AtmosphericElectricHourPage.lineChart'));
 
-        this.handleChangeLineChartOption();
+        _page.handleChangeLineChartOption();
+
+        _page.state.heatChart = echarts.init(document.getElementById('AtmosphericElectricHourPage.heatChart'));
+
+        _page.handleChangeHeatChartOption();
 
     },
 
@@ -322,46 +340,10 @@ const AtmosphericElectricHourPage = React.createClass({
                 height: (this.state.mapChartHeight + 50) * 0.4
             }}>
            </Box>
-            <Box style={{
+            <Box id='AtmosphericElectricHourPage.lineChart'  style={{
                 width: '95%',
-                height: (this.state.mapChartHeight + 50) * 0.6,
-                marginRight: 50
+                height: (this.state.heatChartHeight + 50) * 0.6
             }}>
-          <Table
-            width={'100%'}
-            fixedHeader={false}
-            selectable={true}
-            multiSelectable={false}
-            onRowSelection={this._onRowSelection}
-            >
-          <TableHeader enableSelectAll={false}>
-            <TableRow>
-              <TableHeaderColumn colSpan="3" tooltip="Super Header" style={{
-                textAlign: 'center'
-            }}>
-                Super Header
-              </TableHeaderColumn>
-            </TableRow>
-            <TableRow>
-              <TableHeaderColumn tooltip="站名">站名</TableHeaderColumn>
-              <TableHeaderColumn tooltip="预警值">预警值</TableHeaderColumn>
-              <TableHeaderColumn tooltip="最后更新时间">更新时间</TableHeaderColumn>
-            </TableRow>
-          </TableHeader>
-          <TableBody
-            deselectOnClickaway={false}
-            showRowHover={true}
-            stripedRows={true}
-            >
-            {this.state.warnData.data.map((row, index) => (
-            <TableRow key={index} selected={row.selected}>
-                <TableRowColumn>{AEStationNameMap[row.sid]}</TableRowColumn>
-                <TableRowColumn>{row.value}</TableRowColumn>
-                <TableRowColumn>{row.last_time}</TableRowColumn>
-              </TableRow>
-            ))}
-            </TableBody>
-            </Table>
             </Box>
             </Box>
             <Box style={{
@@ -378,7 +360,7 @@ const AtmosphericElectricHourPage = React.createClass({
             <IconButton tooltip="-1小时"  tooltipPosition='top-center' value={-1}  onClick={this.handleChangeTimeByMinute}>
             <NavigationChevronLeft  />
             </IconButton>
-            <Datetime dateFormat='YYYY-MM-DD' timeFormat='HH' locale='zh_cn' value={this.state.dateTime} />
+            <DateTimeField />
             <IconButton tooltip="+1小时" tooltipPosition='top-center' value={1}  onClick={this.handleChangeTimeByMinute}>
             <NavigationChevronRight />
             </IconButton>

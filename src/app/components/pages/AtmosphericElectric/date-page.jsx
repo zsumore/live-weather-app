@@ -42,7 +42,7 @@ const AtmosphericElectricDatePage = React.createClass({
     render() {
         return (
             <div><h2 className='page-title'>大气电场日数据</h2>
-            <div>hello</div>
+            <div>开发中</div>
             <div id='AtmosphericElectricHourPage.mapChart' style={{
                 width: this.state.mapChartWidth,
                 height: this.state.mapChartHeight
