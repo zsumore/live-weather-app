@@ -2,7 +2,7 @@ import React from 'react';
 import echarts from 'echarts/echarts-line-map';
 import { AEStationCoordMap, AEStationNameMap } from './ae-station-option';
 
-const LineChartOption = {
+const NowLineChartOption = {
     title: {
         text: '大气电场值折线图',
         subtext: '佛山气象局（季华）',
@@ -97,4 +97,4 @@ const LineChartOption = {
     ]
 };
 
-export default LineChartOption;
+export default NowLineChartOption;
