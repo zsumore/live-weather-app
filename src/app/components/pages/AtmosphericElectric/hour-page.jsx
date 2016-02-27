@@ -172,8 +172,12 @@ const AtmosphericElectricHourPage = React.createClass({
         const _page = this;
         const _state = this.state;
 
-        request.get('data/ae-5m-warn.json').end((err, res) => {
-
+        request.post('http://10.151.78.189:8080/monitor/servlet/MapServlet')
+            .type('form')
+            .send({
+                start: '2016-02-27 08:00:00'
+            }
+        ).end((err, res) => {
 
             let _mapChartData = JSON.parse(res.text);
             _page.setState({

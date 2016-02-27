@@ -195,7 +195,7 @@ const AtmosphericElectricNowPage = React.createClass({
         const _page = this;
 
         jQuery.ajax({
-            url: 'http://10.151.78.189:8080/meteoplant/servlet/MapServlet',
+            url: 'http://10.151.78.189:8080/monitor/servlet/MapServlet',
             type: 'post',
             timeout: 5000,
             data: {
@@ -261,7 +261,7 @@ const AtmosphericElectricNowPage = React.createClass({
 
             jQuery.ajax({
 
-                url: 'http://10.151.78.189:8080/meteoplant/servlet/MinuteMeteoServlet',
+                url: 'http://10.151.78.189:8080/monitor/servlet/MinuteMeteoServlet',
                 type: 'post',
                 data: {
                     'stationid': stationid,
