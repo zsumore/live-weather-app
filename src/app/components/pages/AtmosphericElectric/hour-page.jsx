@@ -24,6 +24,7 @@ import NavigationArrowForward from 'material-ui/lib/svg-icons/navigation/arrow-f
 import IconButton from 'material-ui/lib/icon-button';
 
 import request from 'superagent/lib/client';
+import moment from 'moment';
 import { Box } from 'react-layout-components/lib';
 
 import DateTimeField from 'react-bootstrap-datetimepicker';
@@ -32,7 +33,8 @@ import TimerMixin from 'react-timer-mixin';
 import HourMapChartOption from './hour-map-chart-option';
 import HourLineChartOption from './hour-line-chart-option';
 import HourHeatChartOption from './hour-heat-chart-option'
-import { AEStationCoordMap, AEStationNameMap } from './ae-station-option';
+
+import { AEStationSet, AEStationCoordMap, AEStationNameMap } from './ae-station-option';
 
 
 const getMapChartHeight = () => {
@@ -55,16 +57,16 @@ const convertData = (data) => {
     let res = [];
     for (let i = 0; i < data.length; i++) {
 
-        let geoCoord = AEStationCoordMap[data[i].sid];
+        let geoCoord = AEStationCoordMap[data[i].stationid];
 
         if (geoCoord) {
 
-            let geoStaion = AEStationNameMap[data[i].sid];
+            let geoStaion = AEStationNameMap[data[i].stationid];
             if (geoStaion) {
                 // let _concatValue=geoCoord.concat(data[i].value);
 
                 res.push({
-                    name: data[i].sid,
+                    name: data[i].stationid,
                     value: geoCoord.concat(data[i].value)
                 });
             }
@@ -74,7 +76,7 @@ const convertData = (data) => {
     return res;
 };
 
-
+/*
 const getMapChartData = (data) => {
     let res = [];
     for (let i = 0; i < data.length; i++) {
@@ -84,6 +86,17 @@ const getMapChartData = (data) => {
     }
     return res;
 };
+*/
+const getNormalData = (data) => {
+    let res = [];
+    for (let i = 0; i < data.length; i++) {
+
+        res.push(data[i]);
+
+    }
+    return res;
+};
+
 
 const getAELineChartxAxisData = (data) => {
     let res = [];
@@ -107,22 +120,10 @@ const getAELineChartData = (data) => {
 };
 
 
-const getNormalData = (data) => {
-    let res = [];
-    for (let i = 0; i < data.length; i++) {
-        if (data[i].value[2] <= 20) {
-            res.push(data[i]);
-        }
-    }
-    return res;
-};
+
 
 const getNowTime = () => {
-    let _date = new Date();
-    _date.setMinutes(0);
-    _date.setSeconds(0);
-    _date.setMilliseconds(0);
-    return _date;
+    return moment().seconds(0).milliseconds(0);
 };
 
 
@@ -160,7 +161,6 @@ const AtmosphericElectricHourPage = React.createClass({
             mapChartData: {
                 data: []
             },
-            timer: null,
             selectedStation: '59828'
         };
     },
@@ -168,25 +168,52 @@ const AtmosphericElectricHourPage = React.createClass({
     mixins: [StylePropable, StyleResizable, TimerMixin],
 
 
-    handleChangeMapChartData(param) {
+    handleChangeMapChartData(dt) {
         const _page = this;
-        const _state = this.state;
+
 
         request.post('http://10.151.78.189:8080/monitor/servlet/MapServlet')
             .type('form')
             .send({
-                start: '2016-02-27 08:00:00'
-            }
-        ).end((err, res) => {
+                start: dt.format('YYYY-MM-DD HH:mm:ss')
+            }).timeout(5000).end((err, res) => {
 
             let _mapChartData = JSON.parse(res.text);
+
+            _page.state.mapChartOption.title.subtext = _mapChartData.datetime;
+            let _tempset = new Set();
+            for (let i = 0; i < _mapChartData.data.length; i++) {
+                _tempset.add(_mapChartData.data[i].stationid);
+            }
+            console.log(_tempset);
+            for ( let x of AEStationSet ) {
+
+                if (_tempset.has(x)) {
+
+                } else {
+                    let _tempdata = {
+                        'last_time': '没数据',
+                        'value': -999,
+                        'stationid': x
+                    };
+                    _mapChartData.data.push(_tempdata);
+                }
+            }
+
+            _mapChartData.data.sort((o1, o2) => {
+                return o2.value - o1.value;
+            });
+            console.log(_mapChartData.data);
+
+            console.log(convertData(_mapChartData.data));
+            _page.state.mapChartOption.series[0].data = convertData(getNormalData(_mapChartData.data));
+            _page.state.mapChartOption.series[1].data = convertData(getNormalData(_mapChartData.data));
+            _page.state.mapChart.clear();
+            _page.state.mapChart.setOption(_page.state.mapChartOption);
+
             _page.setState({
                 mapChartData: _mapChartData
             });
-
-            _state.mapChartOption.series[0].data = convertData(_mapChartData.data);
-            _state.mapChartOption.series[1].data = convertData(_mapChartData.data);
-            _state.mapChart.setOption(_state.mapChartOption);
         });
 
     },
@@ -274,19 +301,7 @@ const AtmosphericElectricHourPage = React.createClass({
 
     },
 
-    handleCheckBoxChange(e, isInputChecked) {
-        if (isInputChecked) {
-            if (this.state.timer) {
-                this.clearInterval(this.state.timer);
-            }
 
-            this.state.timer = this.setInterval(this.handleRefreshTime, 60000);
-        } else {
-            if (this.state.timer) {
-                this.clearInterval(this.state.timer);
-            }
-        }
-    },
 
     componentWillReceiveProps(nextProps, nextContext) {
         const newMuiTheme = nextContext.muiTheme ? nextContext.muiTheme : this.state.muiTheme;
@@ -305,7 +320,6 @@ const AtmosphericElectricHourPage = React.createClass({
 
         const mapChart = _page.state.mapChart = echarts.init(document.getElementById('AtmosphericElectricHourPage.mapChart'));
 
-        _page.state.timer = _page.setInterval(_page.handleRefreshTime, 60000);
 
         mapChart.on('click', function(param) {
             _page.handleChangeStation(param.name);
@@ -344,7 +358,7 @@ const AtmosphericElectricHourPage = React.createClass({
                 height: (this.state.mapChartHeight + 50) * 0.4
             }}>
            </Box>
-            <Box id='AtmosphericElectricHourPage.lineChart'  style={{
+            <Box id='AtmosphericElectricHourPage.heatChart'  style={{
                 width: '95%',
                 height: (this.state.heatChartHeight + 50) * 0.6
             }}>
@@ -364,7 +378,7 @@ const AtmosphericElectricHourPage = React.createClass({
             <IconButton tooltip="-1小时"  tooltipPosition='top-center' value={-1}  onClick={this.handleChangeTimeByMinute}>
             <NavigationChevronLeft  />
             </IconButton>
-            <DateTimeField />
+            <DateTimeField format='YYYY-MM-DD HH:mm:ss' inputFormat='YYYY-MM-DD HH' dateTime={this.state.dateTime.format('YYYY-MM-DD HH:mm:ss')} />
             <IconButton tooltip="+1小时" tooltipPosition='top-center' value={1}  onClick={this.handleChangeTimeByMinute}>
             <NavigationChevronRight />
             </IconButton>
@@ -375,16 +389,7 @@ const AtmosphericElectricHourPage = React.createClass({
             <NavigationRefresh color={Colors.green500} />
             </IconButton>
             </Box>
-            <Box alignItems='center' style={{
-                height: 50,
-                width: 120
-            }}>
-            <Checkbox
-            label="自动更新"
-            defaultChecked={this.state.auto}
-            onCheck={this.handleCheckBoxChange}
-            />
-            </Box>
+            
             </Box>
 
             <Box id='AtmosphericElectricHourPage.mapChart'   style={{
