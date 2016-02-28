@@ -295,7 +295,6 @@ const AtmosphericElectricNowPage = React.createClass({
         this.setState({
             dateTime: _time
         });
-        //console.log(_time);
 
         this.handleChangeDatetime(_time);
 
@@ -469,8 +468,6 @@ const AtmosphericElectricNowPage = React.createClass({
             <IconButton tooltip="-5分钟"  tooltipPosition='top-center' value={-5}  onClick={this.handleChangeTimeByMinute}>
             <NavigationChevronLeft  />
             </IconButton>
-
-           
             <DateTimeField  onChange={this.handleChangeDateTimeField} format='YYYY-MM-DD HH:mm:ss' inputFormat='MM-DD HH:mm' dateTime={this.state.dateTime.format('YYYY-MM-DD HH:mm:ss')} />
             <IconButton tooltip="+5分钟" tooltipPosition='top-center' value={5}  onClick={this.handleChangeTimeByMinute}>
             <NavigationChevronRight />
@@ -493,15 +490,12 @@ const AtmosphericElectricNowPage = React.createClass({
             />
             </Box>
             </Box>
-
             <Box id='AtmosphericElectricHourPage.mapChart'   style={{
                 width: this.state.mapChartHeight,
                 height: this.state.mapChartHeight
             }} />
             </Box>
             </Box>
-         
-    
         </div>);
     }
 });

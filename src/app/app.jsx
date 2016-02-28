@@ -14,6 +14,7 @@ window.Perf = require('react-addons-perf');
 //Check this repo:
 //https://github.com/zilverline/react-tap-event-plugin
 injectTapEventPlugin();
+console.log("hello world");
 
 /**
  * Render the main app component. You can read more about the react-router here:
