@@ -269,32 +269,7 @@ const AtmosphericElectricNowPage = React.createClass({
                 _state.lineChart.setOption(_lineChartOption);
 
             });
-        /*
-                    jQuery.ajax({
 
-                        url: 'http://10.151.78.189:8080/monitor/servlet/MinuteMeteoServlet',
-                        type: 'post',
-                        data: {
-                            'stationid': stationid,
-                            'start': dt.format('YYYY-MM-DD HH:mm:ss')
-                        },
-                        success: (res) => {
-
-                            let _valueData = JSON.parse(res);
-
-                            let _lineChartOption = _state.lineChartOption;
-                            _lineChartOption.xAxis[0].data = getAELineChartxAxisData(_valueData.data).map((str) => {
-                                return str.replace(' ', '\n')
-                            });
-                            _lineChartOption.series[0].data = getAELineChartData(_valueData.data);
-                            _state.lineChart.clear();
-                            _state.lineChart.setOption(_lineChartOption);
-                        },
-                        error: (res) => {
-                            console.log(res);
-                        }
-                    });
-        */
         }
 
     },
@@ -415,18 +390,7 @@ const AtmosphericElectricNowPage = React.createClass({
 
                 _page.handleChangeMapChartData(_page.state.dateTime);
             });
-        /*
-        jQuery.ajax({
 
-            url: 'map/json/440600.json',
-            type: 'get',
-            success: (res) => {
-        echarts.registerMap('foshan', res);
-
-        _page.handleChangeMapChartData(_page.state.dateTime);
-            }
-        });
-*/
         _page.state.lineChart = echarts.init(document.getElementById('AtmosphericElectricHourPage.lineChart'));
         _page.handleChangeLineChartOption('59828', _page.state.dateTime);
 
