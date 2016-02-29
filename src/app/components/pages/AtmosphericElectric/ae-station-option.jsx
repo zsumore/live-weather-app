@@ -1,4 +1,5 @@
 import React from 'react';
+import 'babel-polyfill';
 
 export const AEStationSet = new Set(['59828', 'AE2267', 'AE2213', 'AE6834', 'AE2264', 'AE2262', 'AE2270', 'AE2229', 'AE6963', 'AE6946', 'AE2224', 'AE6949', 'AE7019', 'AE7032', 'AE7031', '59288']);
 

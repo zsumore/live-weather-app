@@ -129,11 +129,7 @@ const HourMapChartOption = {
                 normal: {
                     formatter: '{b}',
                     position: 'right',
-                    show: false,
-                    formatter: (params, ticket, callback) => {
-
-                        return AEStationNameMap[params.name];
-                    }
+                    show: false
                 },
                 emphasis: {
                     show: true,
@@ -159,7 +155,7 @@ const HourMapChartOption = {
             symbolSize: 10,
             label: {
                 normal: {
-                    formatter: '{c}',
+
                     position: 'right',
                     show: true,
                     formatter: (params, ticket, callback) => {

@@ -127,7 +127,7 @@ const NowMapChartOption = {
             symbolSize: 10,
             label: {
                 normal: {
-                    formatter: '{b}',
+
                     position: 'right',
                     show: false,
                     formatter: (params, ticket, callback) => {
@@ -164,7 +164,7 @@ const NowMapChartOption = {
             hoverAnimation: true,
             label: {
                 normal: {
-                    formatter: '{b}',
+
                     position: 'right',
                     show: true,
                     formatter: (params, ticket, callback) => {
