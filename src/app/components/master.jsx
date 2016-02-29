@@ -80,11 +80,15 @@ const DarkTheme = getMuiTheme(Styles.darkBaseTheme);
 const Master = React.createClass({
     propTypes: {
         children: React.PropTypes.node,
-        history: React.PropTypes.object,
+        // history: React.PropTypes.object,
         location: React.PropTypes.object
     },
+    contextTypes: {
+        router: React.PropTypes.object.isRequired
+    },
     childContextTypes: {
-        muiTheme: React.PropTypes.object
+        muiTheme: React.PropTypes.object,
+        router: React.PropTypes.object
     },
     mixins: [
         StylePropable,
@@ -100,7 +104,8 @@ const Master = React.createClass({
     },
     getChildContext() {
         return {
-            muiTheme: this.state.muiTheme
+            muiTheme: this.state.muiTheme,
+            router: this.context.router
         };
     },
     componentWillMount() {
@@ -152,7 +157,7 @@ const Master = React.createClass({
 
     },
     handleRequestChangeList(event, value) {
-        this.props.history.push(value);
+        this.context.router.push(value);
     },
     handleChangeMuiTheme(newMuiTheme) {
         this.setState({
@@ -229,7 +234,7 @@ const Master = React.createClass({
         </div> }
       <AppLeftNav
             style={ styles.leftNav }
-            history={ history }
+            //history={ history }
             location={ location }
             docked={ true }
             onRequestChangeList={ this.handleRequestChangeList }

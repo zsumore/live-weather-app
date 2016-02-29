@@ -13,7 +13,6 @@ const SelectableList = SelectableContainerEnhance(List);
 const AppLeftNav = React.createClass({
     propTypes: {
         docked: React.PropTypes.bool.isRequired,
-        history: React.PropTypes.object.isRequired,
         location: React.PropTypes.object.isRequired,
         onRequestChangeList: React.PropTypes.func.isRequired,
         open: React.PropTypes.bool.isRequired,
@@ -21,7 +20,7 @@ const AppLeftNav = React.createClass({
     },
     contextTypes: {
         muiTheme: React.PropTypes.object,
-        router: React.PropTypes.func
+    //router: React.PropTypes.object
     },
     mixins: [
         StylePropable
@@ -30,7 +29,7 @@ const AppLeftNav = React.createClass({
         window.location = value;
     },
     handleTouchTapHeader() {
-        this.props.history.push('/');
+        //this.context.router.push('/');
         this.setState({
             leftNavOpen: true
         });

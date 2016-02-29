@@ -213,7 +213,7 @@ const AtmosphericElectricNowPage = React.createClass({
 
                 } else {
                     let _tempdata = {
-                        'last_time': '没数据',
+                        'last_time': '无数据',
                         'value': -999,
                         'stationid': x
                     };
@@ -383,7 +383,7 @@ const AtmosphericElectricNowPage = React.createClass({
 
         });
 
-        request.get('map/json/440600.json').timeout(5000)
+        request.get('/map/json/440600.json').timeout(5000)
             .end((err, res) => {
                 echarts.registerMap('foshan', res.text);
 
@@ -468,7 +468,11 @@ const AtmosphericElectricNowPage = React.createClass({
             <IconButton tooltip="-5分钟"  tooltipPosition='top-center' value={-5}  onClick={this.handleChangeTimeByMinute}>
             <NavigationChevronLeft  />
             </IconButton>
-            <DateTimeField  onChange={this.handleChangeDateTimeField} format='YYYY-MM-DD HH:mm:ss' inputFormat='MM-DD HH:mm' dateTime={this.state.dateTime.format('YYYY-MM-DD HH:mm:ss')} />
+            <div style={{
+                width: 160
+            }}>
+            <DateTimeField   onChange={this.handleChangeDateTimeField} format='YYYY-MM-DD HH:mm:ss' inputFormat='MM-DD HH:mm' dateTime={this.state.dateTime.format('YYYY-MM-DD HH:mm:ss')} />
+            </div>
             <IconButton tooltip="+5分钟" tooltipPosition='top-center' value={5}  onClick={this.handleChangeTimeByMinute}>
             <NavigationChevronRight />
             </IconButton>

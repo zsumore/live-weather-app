@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Router } from 'react-router';
+import { Router, hashHistory } from 'react-router'
 import AppRoutes from './app-routes';
 import injectTapEventPlugin from 'react-tap-event-plugin';
-import createHistory from 'history/lib/createHashHistory';
+
 
 //Helpers for debugging
 window.React = React;
@@ -14,7 +14,7 @@ window.Perf = require('react-addons-perf');
 //Check this repo:
 //https://github.com/zilverline/react-tap-event-plugin
 injectTapEventPlugin();
-console.log("hello world");
+//console.log("hello world");
 
 /**
  * Render the main app component. You can read more about the react-router here:
@@ -22,11 +22,7 @@ console.log("hello world");
  */
 ReactDOM.render(
     <Router
-    history={createHistory({
-        queryKey: false
-    })}
+    history={hashHistory} routes={AppRoutes}
     onUpdate={() => window.scrollTo(0, 0)}
-    >
-    {AppRoutes}
-  </Router>
+    />
     , document.getElementById('app'));

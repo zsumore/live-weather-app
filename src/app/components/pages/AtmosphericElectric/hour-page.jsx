@@ -32,7 +32,8 @@ import TimerMixin from 'react-timer-mixin';
 
 import HourMapChartOption from './hour-map-chart-option';
 import HourLineChartOption from './hour-line-chart-option';
-import HourHeatChartOption from './hour-heat-chart-option'
+import HourHeatChartOption from './hour-heat-chart-option';
+
 
 import { AEStationSet, AEStationCoordMap, AEStationNameMap } from './ae-station-option';
 
@@ -138,7 +139,6 @@ const AtmosphericElectricHourPage = React.createClass({
     propTypes: {
         onChangeMuiTheme: React.PropTypes.func,
         isLeftNavClose: React.PropTypes.bool
-
     },
 
     contextTypes: {
@@ -185,7 +185,7 @@ const AtmosphericElectricHourPage = React.createClass({
             for (let i = 0; i < _mapChartData.data.length; i++) {
                 _tempset.add(_mapChartData.data[i].stationid);
             }
-            console.log(_tempset);
+            //console.log(_tempset);
             for ( let x of AEStationSet ) {
 
                 if (_tempset.has(x)) {
@@ -203,9 +203,9 @@ const AtmosphericElectricHourPage = React.createClass({
             _mapChartData.data.sort((o1, o2) => {
                 return o2.value - o1.value;
             });
-            console.log(_mapChartData.data);
+            //console.log(_mapChartData.data);
 
-            console.log(convertData(_mapChartData.data));
+            // console.log(convertData(_mapChartData.data));
             _page.state.mapChartOption.series[0].data = convertData(getNormalData(_mapChartData.data));
             _page.state.mapChartOption.series[1].data = convertData(getNormalData(_mapChartData.data));
             _page.state.mapChart.clear();
@@ -232,7 +232,7 @@ const AtmosphericElectricHourPage = React.createClass({
 
 
 
-            request.get('data/ae-hour-data.json').end((err, res) => {
+            request.get('/data/ae-hour-data.json').end((err, res) => {
 
                 let _valueData = JSON.parse(res.text);
                 let _lineChartOption = _state.lineChartOption
@@ -316,7 +316,10 @@ const AtmosphericElectricHourPage = React.createClass({
 
 
     componentDidMount() {
+
         const _page = this;
+
+        console.log(_page.props.params);
 
         const mapChart = _page.state.mapChart = echarts.init(document.getElementById('AtmosphericElectricHourPage.mapChart'));
 
@@ -325,7 +328,7 @@ const AtmosphericElectricHourPage = React.createClass({
             _page.handleChangeStation(param.name);
 
         });
-        request.get('map/json/440600.json').end((err, res) => {
+        request.get('/map/json/440600.json').end((err, res) => {
 
             echarts.registerMap('foshan', res.text);
 
@@ -378,7 +381,11 @@ const AtmosphericElectricHourPage = React.createClass({
             <IconButton tooltip="-1小时"  tooltipPosition='top-center' value={-1}  onClick={this.handleChangeTimeByMinute}>
             <NavigationChevronLeft  />
             </IconButton>
+            <div style={{
+                width: 160
+            }}>
             <DateTimeField format='YYYY-MM-DD HH:mm:ss' inputFormat='YYYY-MM-DD HH' dateTime={this.state.dateTime.format('YYYY-MM-DD HH:mm:ss')} />
+            </div>
             <IconButton tooltip="+1小时" tooltipPosition='top-center' value={1}  onClick={this.handleChangeTimeByMinute}>
             <NavigationChevronRight />
             </IconButton>

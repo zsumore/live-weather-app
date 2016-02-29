@@ -19,18 +19,19 @@ import AtmosphericElectricMonthPage from './components/pages/AtmosphericElectric
  * handler and its parent handler like so: Paper > Components > Master
  */
 const AppRoutes = (
-<Route path = "/" component = {Master} >
+<Route path = '/' component = {Master} >
 
     { /* Show the dashboard at / */ }
     <IndexRoute component={AtmosphericElectricNowPage} />
-    <Redirect from="atmospheric-electric" to="/atmospheric-electric/now" />
-    <Route path = "atmospheric-electric" >
-    <Route path="now" component={AtmosphericElectricNowPage} />
-    <Route path="hour" component={AtmosphericElectricHourPage} />
-    <Route path="date" component = {AtmosphericElectricDatePage}/>
-    <Route path="month" component = {AtmosphericElectricMonthPage}/>
+    <Redirect from='atmospheric-electric' to='/atmospheric-electric/now' />
+    <Route path = 'atmospheric-electric' >
+    <Route path='now' component={AtmosphericElectricNowPage} />
+    <Route path='hour' component={AtmosphericElectricHourPage} />
+    <Route path='hour/:datetime' component={AtmosphericElectricHourPage} />
+    <Route path='date' component = {AtmosphericElectricDatePage}/>
+    <Route path='month' component = {AtmosphericElectricMonthPage}/>
     </Route> 
-    <Redirect from = "*" to = "/atmospheric-electric/hour" />
+    <Redirect from = '*' to = '/atmospheric-electric/now' />
     </Route>
 );
 
