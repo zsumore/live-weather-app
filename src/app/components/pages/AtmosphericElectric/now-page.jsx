@@ -126,7 +126,7 @@ const getAELineChartData = (data) => {
         res.push(data[i].intensity);
 
     }
-    console.log(res);
+    //console.log(res);
     return res;
 };
 
@@ -284,13 +284,12 @@ const AtmosphericElectricNowPage = React.createClass({
 
     },
 
-    handleChangeTimeByMinute(event) {
+    handleChangeTimeByMinute(param) {
 
 
         let _time = moment(this.state.dateTime);
 
-
-        _time.minutes(_time.minutes() + parseInt(event.target.value));
+        _time.minutes(_time.minutes() + param);
 
         this.setState({
             dateTime: _time
@@ -312,13 +311,13 @@ const AtmosphericElectricNowPage = React.createClass({
 
     },
     handleChangeDatetime(_time) {
-        console.log(this.state.selectedStation);
+
         this.handleChangeLineChartOption(this.state.selectedStation, _time);
         this.handleChangeMapChartData(_time);
     },
 
     handleChangeDateTimeField(event) {
-        console.log(event);
+
         let _time = moment(event);
 
         this.setState({
@@ -335,7 +334,7 @@ const AtmosphericElectricNowPage = React.createClass({
 
             let _name = AEStationNameMap[sid];
             if (_name) {
-                console.log(_name);
+
                 this.state.lineChartOption.title.subtext = _name;
                 this.handleChangeLineChartOption(sid, this.state.dateTime);
 
@@ -383,7 +382,7 @@ const AtmosphericElectricNowPage = React.createClass({
 
         });
 
-        request.get('/map/json/440600.json').timeout(5000)
+        request.get('map/json/440600.json').timeout(5000)
             .end((err, res) => {
                 echarts.registerMap('foshan', res.text);
 
@@ -462,10 +461,10 @@ const AtmosphericElectricNowPage = React.createClass({
             <Box alignItems='center' style={{
                 height: 50
             }}>
-            <IconButton tooltip="-10分钟" tooltipPosition='top-center'  value={-10}  onClick={this.handleChangeTimeByMinute} >
+            <IconButton tooltip="-10分钟" tooltipPosition='top-center'    onClick={this.handleChangeTimeByMinute.bind(this, -10)} >
             <NavigationArrowBack  />
             </IconButton>
-            <IconButton tooltip="-5分钟"  tooltipPosition='top-center' value={-5}  onClick={this.handleChangeTimeByMinute}>
+            <IconButton tooltip="-5分钟"  tooltipPosition='top-center'   onClick={this.handleChangeTimeByMinute.bind(this, -5)}>
             <NavigationChevronLeft  />
             </IconButton>
             <div style={{
@@ -473,10 +472,10 @@ const AtmosphericElectricNowPage = React.createClass({
             }}>
             <DateTimeField   onChange={this.handleChangeDateTimeField} format='YYYY-MM-DD HH:mm:ss' inputFormat='MM-DD HH:mm' dateTime={this.state.dateTime.format('YYYY-MM-DD HH:mm:ss')} />
             </div>
-            <IconButton tooltip="+5分钟" tooltipPosition='top-center' value={5}  onClick={this.handleChangeTimeByMinute}>
+            <IconButton tooltip="+5分钟" tooltipPosition='top-center'   onClick={this.handleChangeTimeByMinute.bind(this, 5)}>
             <NavigationChevronRight />
             </IconButton>
-            <IconButton tooltip="+10分钟"  tooltipPosition='top-center' value={10}  onClick={this.handleChangeTimeByMinute}>
+            <IconButton tooltip="+10分钟"  tooltipPosition='top-center'   onClick={this.handleChangeTimeByMinute.bind(this, 10)}>
             <NavigationArrowForward />
             </IconButton>
             <IconButton tooltip="刷新"  tooltipPosition='top-center'  onClick={this.handleRefreshTime}>
