@@ -12,8 +12,11 @@ import TableHeader from 'material-ui/lib/table/table-header';
 import TableRowColumn from 'material-ui/lib/table/table-row-column';
 import TableBody from 'material-ui/lib/table/table-body';
 import Colors from 'material-ui/lib/styles/colors';
-
 import Checkbox from 'material-ui/lib/checkbox';
+import Avatar from 'material-ui/lib/avatar';
+import CommunicationLiveHelp from 'material-ui/lib/svg-icons/communication/live-help';
+import ContentLink from 'material-ui/lib/svg-icons/content/link';
+import FlatButton from 'material-ui/lib/flat-button';
 
 
 import NavigationRefresh from 'material-ui/lib/svg-icons/navigation/refresh';
@@ -148,7 +151,8 @@ const getNowTime = () => {
 
 
 const iconStyles = {
-    marginTop: 8
+    marginTop: 8,
+    marginRight: 24,
 };
 
 
@@ -399,8 +403,21 @@ const AtmosphericElectricNowPage = React.createClass({
 
 
         return (
-            <div><h2 className='page-title'>大气电场即时数据</h2>
-            
+            <div>
+            <Box className='page-title'  justifyContent='space-between' alignItems='baseline'>
+            <Box   justifyContent='space-between' alignItems='baseline'>
+            <h3>大气电场即时数据</h3>
+            <a className={ 'hint--top-right' } data-hint={ '数据查询' } href="http://www.w3school.com.cn/" target="_blank">
+            <ContentLink style={{
+                marginLeft: 10
+            }} />
+            />   
+            </a>
+            </Box>
+            <div className={ 'hint--top-left' } data-hint={ '使用说明' }>
+            <CommunicationLiveHelp  style={iconStyles} color={Colors.blue500} hoverColor={Colors.greenA200} onClick={() => alert('click help')} />
+            </div>
+            </Box>
             <Box width='100%'  justifyContent='space-around' alignItems='flex-start'  column={false} reverse={false}>
             <Box  flex={1} style={{
                 width: this.state.lineChartWidth,

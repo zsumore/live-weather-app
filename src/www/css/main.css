@@ -39,8 +39,8 @@ body {
 }
 
 .page-title {
-    line-height: 24px;
-    padding-bottom: 0;
+    margin: 0;
+    padding: 0;
     border-bottom: 1px solid #eee;
 }
 
