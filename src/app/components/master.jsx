@@ -39,7 +39,7 @@ function getStyles() {
             paddingLeft: 256
         },
         content: {
-            margin: Spacing.desktopGutter
+            margin: Spacing.desktopGutterLess
         },
         contentWhenMedium: {
             margin: `${Spacing.desktopGutter * 2}px ${Spacing.desktopGutter * 3}px`

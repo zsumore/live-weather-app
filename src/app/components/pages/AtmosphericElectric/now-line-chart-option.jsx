@@ -79,14 +79,18 @@ const NowLineChartOption = {
         {
             name: '电场值(KV/m)',
             type: 'value'
+        },
+        {
+            name: '电场差值(KV/m)',
+            type: 'value'
         }
     ],
     series: [
         {
             name: '电场值',
             type: 'line',
+            yAxisIndex: 1,
             hoverAnimation: false,
-
             lineStyle: {
                 normal: {
                     width: 1

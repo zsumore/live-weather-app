@@ -247,9 +247,11 @@ const AtmosphericElectricHourPage = React.createClass({
 
                 let _valueData = JSON.parse(res.text);
                 let _lineChartOption = _state.lineChartOption
+                /*
                 _lineChartOption.xAxis[0].data = getAELineChartxAxisData(_valueData.data).map((str) => {
                     return str.replace(' ', '\n')
                 });
+                */
                 _lineChartOption.series[0].data = getAELineChartData(_valueData.data);
                 _state.lineChart.setOption(_lineChartOption);
             });
@@ -361,8 +363,10 @@ const AtmosphericElectricHourPage = React.createClass({
 
 
         return (
-            <div><h2 className='page-title'>大气电场时数据</h2>
-            
+            <div>
+            <Box className='page-title'  justifyContent='space-between' alignItems='baseline'>
+            <h3>大气电场时数据</h3><span>hello</span>
+            </Box>
             <Box width='100%'  justifyContent='space-around' alignItems='flex-start'  column={false} reverse={false}>
             <Box  flex={1} style={{
                 width: this.state.lineChartWidth,
@@ -418,8 +422,8 @@ const AtmosphericElectricHourPage = React.createClass({
             </Box>
             </Box>
          
-    
-        </div>);
+    </div>
+            );
     }
 });
 

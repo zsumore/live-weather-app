@@ -23,6 +23,8 @@ h6 {
     margin: 0;
 }
 
+
+
 body {
     font-size: 15px;
     line-height: 24px;
@@ -37,9 +39,8 @@ body {
 }
 
 .page-title {
-    padding-bottom: .3em;
-    font-size: 1.5em;
-    line-height: 1.334;
+    line-height: 24px;
+    padding-bottom: 0;
     border-bottom: 1px solid #eee;
 }
 
