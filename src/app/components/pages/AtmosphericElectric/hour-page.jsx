@@ -161,11 +161,24 @@ const AtmosphericElectricHourPage = React.createClass({
             mapChartData: {
                 data: []
             },
+            hourData: {},
             selectedStation: '59828'
         };
     },
 
     mixins: [StylePropable, StyleResizable, TimerMixin],
+
+
+    handleChangeHourData() {
+        request.get('data/ae-hour-heat-chart-data.json').type('form')
+            .send({
+                start: dt.format('YYYY-MM-DD HH:mm:ss')
+            }).timeout(5000).end((err, res) => {
+
+            let _hourData = JSON.parse(res.text);
+
+        });
+    },
 
 
     handleChangeMapChartData(dt) {
@@ -230,8 +243,6 @@ const AtmosphericElectricHourPage = React.createClass({
             _state.lineChart.setOption(option);
         } else {
 
-
-
             request.get('data/ae-hour-data.json').end((err, res) => {
 
                 let _valueData = JSON.parse(res.text);
@@ -250,7 +261,7 @@ const AtmosphericElectricHourPage = React.createClass({
     handleChangeHeatChartOption(option) {
         const _state = this.state;
         if (option) {
-            _state.lineChart.setOption(option);
+            _state.heatChart.setOption(option);
         } else {
 
         }
