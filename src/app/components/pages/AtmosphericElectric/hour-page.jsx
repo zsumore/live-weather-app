@@ -23,6 +23,9 @@ import NavigationArrowBack from 'material-ui/lib/svg-icons/navigation/arrow-back
 import NavigationArrowForward from 'material-ui/lib/svg-icons/navigation/arrow-forward';
 import IconButton from 'material-ui/lib/icon-button';
 
+import CommunicationLiveHelp from 'material-ui/lib/svg-icons/communication/live-help';
+import ContentLink from 'material-ui/lib/svg-icons/content/link';
+
 import request from 'superagent/lib/client';
 import moment from 'moment';
 import { Box } from 'react-layout-components/lib';
@@ -365,7 +368,18 @@ const AtmosphericElectricHourPage = React.createClass({
         return (
             <div>
             <Box className='page-title'  justifyContent='space-between' alignItems='baseline'>
-            <h3>大气电场时数据</h3><span>hello</span>
+            <Box   justifyContent='space-between' alignItems='baseline'>
+            <h3>大气电场时数据</h3>
+            <a className={ 'hint--top-right' } data-hint={ '数据查询' } href="http://10.151.64.202:8097/home" target="_blank">
+            <ContentLink style={{
+                marginLeft: 10
+            }} />
+            />   
+            </a>
+            </Box>
+            <div className={ 'hint--top-left' } data-hint={ '使用说明' }>
+            <CommunicationLiveHelp  style={iconStyles} color={Colors.blue500} hoverColor={Colors.greenA200} onClick={() => alert('click help')} />
+            </div>
             </Box>
             <Box width='100%'  justifyContent='space-around' alignItems='flex-start'  column={false} reverse={false}>
             <Box  flex={1} style={{

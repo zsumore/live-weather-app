@@ -13,10 +13,9 @@ import TableRowColumn from 'material-ui/lib/table/table-row-column';
 import TableBody from 'material-ui/lib/table/table-body';
 import Colors from 'material-ui/lib/styles/colors';
 import Checkbox from 'material-ui/lib/checkbox';
-import Avatar from 'material-ui/lib/avatar';
+
 import CommunicationLiveHelp from 'material-ui/lib/svg-icons/communication/live-help';
 import ContentLink from 'material-ui/lib/svg-icons/content/link';
-import FlatButton from 'material-ui/lib/flat-button';
 
 
 import NavigationRefresh from 'material-ui/lib/svg-icons/navigation/refresh';
@@ -407,7 +406,7 @@ const AtmosphericElectricNowPage = React.createClass({
             <Box className='page-title'  justifyContent='space-between' alignItems='baseline'>
             <Box   justifyContent='space-between' alignItems='baseline'>
             <h3>大气电场即时数据</h3>
-            <a className={ 'hint--top-right' } data-hint={ '数据查询' } href="http://www.w3school.com.cn/" target="_blank">
+            <a className={ 'hint--top-right' } data-hint={ '数据查询' } href="http://10.151.64.202:8097/home" target="_blank">
             <ContentLink style={{
                 marginLeft: 10
             }} />
