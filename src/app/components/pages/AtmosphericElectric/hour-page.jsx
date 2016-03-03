@@ -38,7 +38,9 @@ import HourLineChartOption from './hour-line-chart-option';
 import HourHeatChartOption from './hour-heat-chart-option';
 
 
-import { AEStationSet, AEStationCoordMap, AEStationNameMap } from './ae-station-option';
+import { AEStationSet, AEStationCoordMap, AEStationNameMap, AEStationArray } from './ae-station-option';
+
+
 
 
 const getMapChartHeight = () => {
@@ -268,7 +270,8 @@ const AtmosphericElectricHourPage = React.createClass({
         if (option) {
             _state.heatChart.setOption(option);
         } else {
-
+            _state.heatChart.setOption(_state.heatChartOption);
+            console.log(_state.heatChartOption.xAxis.data);
         }
     },
 
@@ -294,11 +297,11 @@ const AtmosphericElectricHourPage = React.createClass({
         this.setState({
             dateTime: _time
         });
-        console.log('refreshtime:' + _time);
+        // console.log('refreshtime:' + _time);
 
     },
     handleChangeDatetime(value) {
-        console.log(value);
+        //console.log(value);
 
     },
     handleChangeStation(sid) {
@@ -336,7 +339,7 @@ const AtmosphericElectricHourPage = React.createClass({
 
         const _page = this;
 
-        console.log(_page.props.params);
+        //console.log(_page.props.params);
 
         const mapChart = _page.state.mapChart = echarts.init(document.getElementById('AtmosphericElectricHourPage.mapChart'));
 
@@ -387,13 +390,13 @@ const AtmosphericElectricHourPage = React.createClass({
                 height: this.state.mapChartHeight + 50
             }} column>
              <Box id='AtmosphericElectricHourPage.lineChart'  style={{
-                width: '95%',
+
                 height: (this.state.mapChartHeight + 50) * 0.4
             }}>
            </Box>
             <Box id='AtmosphericElectricHourPage.heatChart'  style={{
-                width: '95%',
-                height: (this.state.heatChartHeight + 50) * 0.6
+
+                height: (this.state.mapChartHeight + 50) * 0.6
             }}>
             </Box>
             </Box>
